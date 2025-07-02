@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><div class="container">
+             
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Area 7 Youth Church{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    {% load static %}
+    
+    <style>
+        :root {
+            --primary-green: #28a745;
+            --light-green: #d4edda;
+            --dark-green: #155724;
+            --accent-green: #20c997;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            background: var(--primary-green);
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .nav-link {
+            color: white !important;
+            border-radius: 8px;
+            margin: 2px 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateX(5px);
+        }
+        
+        .nav-link.active {
+            background: var(--dark-green);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .toggle-btn {
+            background: var(--dark-green);
+            border: none;
+            color: white;
+        }
+        
+        .toggle-btn:hover {
+            background: var(--accent-green);
+            color: white;
+        }
+        
+        .main-content {
+            min-height: calc(100vh - 60px);
+        }
+        
+        .footer {
+            background: var(--primary-green);
+            color: white;
+            margin-top: auto;
+        }
+        
+        .footer a {
+            color: var(--light-green);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer a:hover {
+            color: white;
+        }
+        
+        .social-icons a {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            background: var(--dark-green);
+            border-radius: 50%;
+            margin: 0 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .social-icons a:hover {
+            background: var(--accent-green);
+            transform: translateY(-3px);
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <nav class="sidebar vh-100 position-fixed" style="width: 80px; z-index: 1000;">
+            <div class="d-flex flex-column h-100 py-3">
+                <!-- Logo Section -->
+                <div class="text-center mb-3 pb-3 border-bottom border-light border-opacity-25">
+                    <a href="{% url 'core:home' %}">
+                        <img src="{% static 'assets/images/arealogo.jpg' %}" alt="Area 7 Youth Logo" 
+                             class="rounded-circle" style="height: 40px; width: 40px; object-fit: cover;">
+                    </a>
+                </div>
+                
+                <!-- Toggle Button -->
+                <div class="text-center mb-3">
+                    <button class="btn toggle-btn btn-sm rounded" onclick="toggleSidebar()" 
+                            style="width: 40px; height: 40px;">
+                        <i class="fas fa-chevron-right" id="toggleIcon"></i>
+                    </button>
+                </div>
+                
+                <!-- Navigation Items -->
+                <ul class="nav flex-column flex-grow-1">
+                    <li class="nav-item mb-2">
+                        <a class="nav-link d-flex align-items-center px-3 py-3 {% if request.resolver_match.url_name == 'home' %}active{% endif %}" 
+                           href="{% url 'core:home' %}" title="Home">
+                            <i class="fas fa-home fs-5"></i>
+                            <span class="nav-text ms-3 d-none">Home</span>
+                        </a>
+                    </li>
+                     <li class="nav-item mb-2">
+                        <a class="nav-link d-flex align-items-center px-3 py-3 {% if request.resolver_match.url_name == 'about' %}active{% endif %}" 
+                           href="{% url 'core:about' %}" title="About Us">
+                            <i class="fas fa-info-circle fs-5"></i>
+                            <span class="nav-text ms-3 d-none">About</span>
+                        </a>
+                    </li>
+                     <li class="nav-item mb-2">
+                        <a class="nav-link d-flex align-items-center px-3 py-3 {% if request.resolver_match.url_name == 'media_gallery' %}active{% endif %}" 
+                           href="{% url 'core:media_gallery' %}" title="Media">
+                            <i class="fas fa-photo-video fs-5"></i>
+                            <span class="nav-text ms-3 d-none">Media</span>
+                        </a>
+                    </li>
+                      <li class="nav-item mb-2">
+                        <a class="nav-link d-flex align-items-center px-3 py-3 {% if request.resolver_match.url_name == 'chatroom' %}active{% endif %}" 
+                           href="{% url 'core:chatroom' %}" title="Chatroom">
+                            <i class="fas fa-comments fs-5"></i>
+                            <span class="nav-text ms-3 d-none">Chatroom</span>
+                        </a>
+                    </li>
+                     <li class="nav-item mb-2">
+                        <a class="nav-link d-flex align-items-center px-3 py-3 {% if request.resolver_match.url_name == 'contact' %}active{% endif %}" 
+                           href="{% url 'core:contact' %}" title="Contact Us">
+                            <i class="fas fa-envelope fs-5"></i>
+                            <span class="nav-text ms-3 d-none">Contact</span>
+                        </a>
+                    </li>
+                   
+                </ul>
+                
+                <!-- Bottom Navigation -->
+                <div class="mt-auto">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center px-3 py-3" 
+                               href="#" title="Prayer Requests">
+                                <i class="fas fa-pray fs-5"></i>
+                                <span class="nav-text ms-3 d-none">Prayer</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        
+        <!-- Main Content Area -->
+        <div class="flex-grow-1 d-flex flex-column" id="mainContent" style="margin-left: 80px;">
+            <main class="main-content flex-grow-1">
+                {% block content %}
+                <!-- Page content goes here -->
+                {% endblock %}
+            </main>
+            
+            <!-- Footer -->
+            <footer class="footer py-5">
+                <div class="container">
+                    <div class="row">
+                        <!-- Church Info -->
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="d-flex align-items-center mb-3">
+                                <img src="{% static 'assets/images/arealogo.jpg' %}" alt="Area 7 Youth Logo" 
+                                     class="rounded-circle me-3" style="height: 50px; width: 50px; object-fit: cover;">
+                                <h5 class="mb-0 fw-bold">Area 7 Youth Church</h5>
+                            </div>
+                            <p class="text-light mb-3">
+                                Empowering young hearts to serve God and make a difference in our community. 
+                                Join us in our journey of faith, fellowship, and growth.
+                            </p>
+                            <div class="social-icons">
+                                <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                                <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+                                <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
+                                <a href="#" title="YouTube"><i class="fab fa-youtube"></i></a>
+                                <a href="#" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                            </div>
+                        </div>
+                        
+                        <!-- Quick Links -->
+                        <div class="col-lg-2 col-md-6 mb-4">
+                            <h6 class="fw-bold mb-3">Quick Links</h6>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><a href="{% url 'core:home' %}">Home</a></li>
+                                <li class="mb-2"><a href="{% url 'core:about' %}">About Us</a></li>
+                                <li class="mb-2"><a href="{% url 'core:media_gallery' %}">Media</a></li>
+                                <li class="mb-2"><a href="{% url 'core:chatroom' %}">Chatroom</a></li>
+                                <li class="mb-2"><a href="{% url 'core:contact' %}">Contact</a></li>
+                               
+                            </ul>
+                        </div>
+                        
+                        <!-- Services -->
+                        <div class="col-lg-2 col-md-6 mb-4">
+                            <h6 class="fw-bold mb-3">Ministries</h6>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><a href="#">Youth Service</a></li>
+                                <li class="mb-2"><a href="#">Bible Study</a></li>
+                                <li class="mb-2"><a href="#">Prayer Group</a></li>
+                                <li class="mb-2"><a href="#">Worship Team</a></li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Contact Info -->
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <h6 class="fw-bold mb-3">Get In Touch</h6>
+                            <div class="mb-2">
+                                <i class="fas fa-map-marker-alt me-2"></i>
+                                <span>Area 7, Harare, Zimbabwe</span>
+                            </div>
+                            <div class="mb-2">
+                                <i class="fas fa-phone me-2"></i>
+                                <a href="tel:+263000000000">+263 000 000 000</a>
+                            </div>
+                            <div class="mb-2">
+                                <i class="fas fa-envelope me-2"></i>
+                                <a href="mailto:info@area7youth.org">info@area7youth.org</a>
+                            </div>
+                            <div class="mb-2">
+                                <i class="fas fa-clock me-2"></i>
+                                <span>Sunday Service: 10:00 AM</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Copyright -->
+                    <hr class="border-light border-opacity-25 my-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <p class="mb-0">&copy; {% now "Y" %} Area 7 Youth Church. All rights reserved.</p>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+ 
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Sidebar Toggle Script -->
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.getElementById('mainContent');
+            const navTexts = document.querySelectorAll('.nav-text');
+            const toggleIcon = document.getElementById('toggleIcon');
+            const logo = document.querySelector('img[alt="Area 7 Youth Logo"]');
+            
+            if (sidebar.style.width === '80px' || sidebar.style.width === '') {
+                // Expand sidebar
+                sidebar.style.width = '250px';
+                mainContent.style.marginLeft = '250px';
+                navTexts.forEach(text => text.classList.remove('d-none'));
+                toggleIcon.style.transform = 'rotate(180deg)';
+                // Expand logo
+                logo.style.height = '60px';
+                logo.style.width = '60px';
+            } else {
+                // Collapse sidebar
+                sidebar.style.width = '80px';
+                mainContent.style.marginLeft = '80px';
+                navTexts.forEach(text => text.classList.add('d-none'));
+                toggleIcon.style.transform = 'rotate(0deg)';
+                // Collapse logo
+                logo.style.height = '40px';
+                logo.style.width = '40px';
+            }
+        }
+        
+        // Add smooth transitions
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelector('.sidebar').style.transition = 'width 0.3s ease';
+            document.getElementById('mainContent').style.transition = 'margin-left 0.3s ease';
+            document.getElementById('toggleIcon').style.transition = 'transform 0.3s ease';
+            document.querySelector('img[alt="Area 7 Youth Logo"]').style.transition = 'height 0.3s ease, width 0.3s ease';
+        });
+
+         
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

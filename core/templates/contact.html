@@ -1,0 +1,311 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Contact Header Card -->
+            <div class="card shadow-lg border-0 mb-5">
+                <div class="card-header bg-primary-green text-black">
+                    <h1 class="display-4 mb-0">
+                        <i class="fas fa-envelope me-2"></i>
+                        Contact Area7
+                    </h1>
+                </div>
+                <div class="card-body text-center">
+                    <p class="lead mb-4">
+                        We'd love to hear from you! Reach out with questions, prayer requests, or just to say hello.
+                    </p>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Contact Form Column -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-header bg-light-green">
+                            <h3 class="mb-0">
+                                <i class="fas fa-paper-plane me-2"></i>
+                                Send Us a Message
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            {% if messages %}
+                                {% for message in messages %}
+                                    <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}info{% endif %}">
+                                        {{ message }}
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                            
+                            <form method="post" action="{% url 'core:contact' %}">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">Your Name</label>
+                                    <input type="text" class="form-control" id="name" name="name" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email Address</label>
+                                    <input type="email" class="form-control" id="email" name="email" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="subject" class="form-label">Subject</label>
+                                    <select class="form-select" id="subject" name="subject">
+                                        <option value="General Inquiry">General Inquiry</option>
+                                        <option value="Prayer Request">Prayer Request</option>
+                                        <option value="Volunteer">Volunteer Opportunity</option>
+                                        <option value="Feedback">Feedback</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="message" class="form-label">Message</label>
+                                    <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+                                </div>
+                                <div class="text-center">
+                                    <button type="submit" class="btn btn-primary-green px-4">
+                                        <i class="fas fa-paper-plane me-2"></i> Send Message
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Info Column -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-header bg-light-green">
+                            <h3 class="mb-0">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Contact Information
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-4">
+                                <h4 class="text-primary-green">
+                                    <i class="fas fa-envelope me-2"></i> Email
+                                </h4>
+                                <p>
+                                    <a href="mailto:area7youth@gmail.com" class="text-decoration-none">
+                                        area7youth@gmail.com
+                                    </a>
+                                </p>
+                            </div>
+
+                            <div class="mb-4">
+                                <h4 class="text-primary-green">
+                                    <i class="fas fa-map-marker-alt me-2"></i> Location
+                                </h4>
+                                <p>
+                                    Area7 Youth Center<br>
+                                    123 Faith Avenue<br>
+                                    Nairobi, Kenya
+                                </p>
+                                <div class="ratio ratio-16x9">
+                                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.808559339089!2d36.82115931475395!3d-1.292385835979925!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f10d664f5f7e3%3A0x9e5ef9a6a1b3d7f4!2sNairobi%20CBD!5e0!3m2!1sen!2ske!4v1620000000000!5m2!1sen!2ske" 
+                                            width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <h4 class="text-primary-green">
+                                    <i class="fas fa-clock me-2"></i> Meeting Times
+                                </h4>
+                                <ul class="list-unstyled">
+                                    <li><strong>Sunday Services:</strong> 9:00 AM - 12:00 PM</li>
+                                    <li><strong>Youth Night:</strong> Fridays 5:00 PM - 8:00 PM</li>
+                                    <li><strong>Bible Study:</strong> Wednesdays 4:00 PM - 6:00 PM</li>
+                                </ul>
+                            </div>
+
+                            <div>
+                                <h4 class="text-primary-green">
+                                    <i class="fas fa-share-alt me-2"></i> Connect With Us
+                                </h4>
+                                <div class="d-flex justify-content-start">
+                                    <a href="#" class="btn btn-outline-primary-green btn-sm me-2">
+                                        <i class="fab fa-facebook-f"></i>
+                                    </a>
+                                    <a href="#" class="btn btn-outline-primary-green btn-sm me-2">
+                                        <i class="fab fa-instagram"></i>
+                                    </a>
+                                    <a href="#" class="btn btn-outline-primary-green btn-sm me-2">
+                                        <i class="fab fa-twitter"></i>
+                                    </a>
+                                    <a href="#" class="btn btn-outline-primary-green btn-sm">
+                                        <i class="fab fa-youtube"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+           <!-- Prayer Request Section -->
+<div class="card border-0 shadow-sm mt-4">
+    <div class="card-header bg-primary-green text-black">
+        <h3 class="mb-0">
+            <i class="fas fa-praying-hands me-2"></i>
+            Submit a Prayer Request
+        </h3>
+    </div>
+    <div class="card-body">
+        <!-- Success/Error Messages -->
+        {% if prayer_messages %}
+            <div class="alert alert-{% if prayer_messages.tags %}{{ prayer_messages.tags }}{% else %}info{% endif %} alert-dismissible fade show" role="alert">
+                {{ prayer_messages }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endif %}
+
+        <form method="post" action="{% url 'core:prayer_request' %}">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="prayerName" class="form-label">Your Name (Optional)</label>
+                <input type="text" class="form-control" id="prayerName" name="prayer_name">
+            </div>
+            <div class="mb-3">
+                <label for="prayerRequest" class="form-label">Prayer Request</label>
+                <textarea class="form-control" id="prayerRequest" name="prayer_request" rows="4" required></textarea>
+            </div>
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="prayerPrivate" name="prayer_private">
+                <label class="form-check-label" for="prayerPrivate">
+                    Keep this request private (only visible to leadership)
+                </label>
+            </div>
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary-green px-4">
+                    <i class="fas fa-pray me-2"></i> Submit Request
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .bg-light-green {
+        background-color: var(--light-green);
+    }
+    
+    .text-primary-green {
+        color: var(--primary-green);
+    }
+    
+    .bg-primary-green {
+        background-color: var(--primary-green);
+    }
+    .btn-primary-green {
+                        background-color: var(--primary-green, #28a745);
+                        border-color: var(--primary-green, #28a745);
+                        color: white;
+                    }
+                    .btn-primary-green:hover, .btn-primary-green:focus {
+                        background-color: darken(var(--primary-green, #28a745), 10%);
+                        border-color: darken(var(--primary-green, #28a745), 10%);
+                    }
+                    .btn-outline-primary-green {
+                        color: var(--primary-green, #28a745);
+                        border-color: var(--primary-green, #28a745);
+                    }
+                    .btn-outline-primary-green:hover, .btn-outline-primary-green:focus {
+                        background-color: var(--primary-green, #28a745);
+                        color: white;
+                    }
+                .btn-highlight-box:hover, .btn-highlight-box:focus {
+                        box-shadow: 0 0 0 3px var(--primary-green, #28a745);
+                        outline: none;
+                        transition: box-shadow 0.2s;
+                    }
+    /* Contact Page Specific Styles */
+    .contact-method {
+        transition: all 0.3s ease;
+        border-left: 3px solid var(--primary-green);
+        padding-left: 15px;
+    }
+    
+    .contact-method:hover {
+        transform: translateX(5px);
+        border-left-width: 5px;
+    }
+    
+    .social-btn {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+    
+    .social-btn:hover {
+        transform: translateY(-3px);
+        background-color: var(--primary-green) !important;
+        color: white !important;
+    }
+    
+    /* Form Styles */
+    .form-control, .form-select {
+        border: 1px solid #dee2e6;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-green);
+        box-shadow: 0 0 0 0.25rem rgba(40, 167, 69, 0.25);
+    }
+    
+    /* Map Container */
+    .map-container {
+        border-radius: 10px;
+        overflow: hidden;
+        border: 3px solid var(--primary-green);
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form submission handling
+    document.getElementById('contactForm').addEventListener('submit', function(e) {
+        // You can add form validation or AJAX submission here
+        alert('Your message has been sent! We will get back to you soon.');
+    });
+    
+    document.getElementById('prayerForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        alert('Thank you for sharing your prayer request. Our team will pray for this need.');
+        this.reset();
+    });
+    
+    // Add smooth scrolling for any anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            document.querySelector(this.getAttribute('href')).scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
+    });
+});
+// Auto-dismiss alerts after 3 seconds
+  setTimeout(function() {
+    let alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+      let fadeEffect = setInterval(() => {
+        if (!alert.style.opacity) {
+          alert.style.opacity = 1;
+        }
+        if (alert.style.opacity > 0) {
+          alert.style.opacity -= 0.1;
+        } else {
+          clearInterval(fadeEffect);
+          alert.remove();
+        }
+      }, 100);
+    });
+  }, 3000);  // 3000 milliseconds = 3 seconds
+</script>
+{% endblock %}

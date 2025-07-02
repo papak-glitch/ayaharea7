@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Area 7 Church - Live Chat</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #25D366;
+            --secondary: #128C7E;
+            --light: #e6ffe6;
+            --accent: #34B7F1;
+            --dark: #075E54;
+            --text: #333;
+            --gray: #ece5dd;
+            --reply-bg: #f5f5f5;
+            --admin-color: #d32f2f;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--secondary), var(--dark));
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 900px;
+            height: 85vh;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 35%;
+            background-color: #f0f2f5;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #ddd;
+        }
+
+        .sidebar-header {
+            padding: 15px;
+            background-color: #f0f2f5;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .admin-avatar {
+            background-color: var(--admin-color);
+        }
+
+        .online-count {
+            font-size: 0.8rem;
+            color: #666;
+            padding: 3px 8px;
+            border-radius: 10px;
+            background-color: rgba(0,0,0,0.05);
+        }
+
+        .online-users {
+            padding: 10px 15px;
+            font-size: 0.85rem;
+            color: #666;
+            border-bottom: 1px solid #eee;
+            display: none;
+        }
+
+        .online-users.admin-visible {
+            display: block;
+        }
+
+        .online-users-list {
+            margin-top: 5px;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        .online-user {
+            display: flex;
+            align-items: center;
+            padding: 3px 0;
+        }
+
+        .online-user.admin {
+            color: var(--admin-color);
+            font-weight: 500;
+        }
+
+        .online-user-badge {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            margin-right: 8px;
+        }
+
+        .group-list {
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        .group-item {
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .group-item:hover {
+            background: #f5f5f5;
+        }
+
+        .group-item.active {
+            background: #e5e5e5;
+        }
+
+        .group-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--accent);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+        }
+
+        .group-info h4 {
+            font-size: 0.95rem;
+            margin-bottom: 2px;
+        }
+
+        .group-info p {
+            font-size: 0.8rem;
+            color: #666;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Chat Area Styles */
+        .chat-area {
+            width: 65%;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .chat-header {
+            padding: 12px 15px;
+            background-color: #f0f2f5;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .chat-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .chat-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .chat-actions i {
+            cursor: pointer;
+            color: #666;
+        }
+
+        .messages-container {
+            flex-grow: 1;
+            padding: 15px;
+            background-color: var(--gray);
+            background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.1'%3E%3Cpath d='M50 50c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10s-10-4.477-10-10 4.477-10 10-10zM10 10c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10S0 25.523 0 20s4.477-10 10-10zm10 8c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8zm40 40c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message {
+            max-width: 75%;
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            position: relative;
+            animation: fadeIn 0.3s ease;
+            word-wrap: break-word;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .message:hover {
+            background-color: rgba(0, 0, 0, 0.03);
+        }
+
+        .message.highlighted {
+            background-color: rgba(0, 128, 0, 0.1);
+            border-left: 3px solid var(--primary);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .received {
+            background-color: white;
+            border-top-left-radius: 0;
+            align-self: flex-start;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .sent {
+            background-color: var(--light);
+            border-top-right-radius: 0;
+            align-self: flex-end;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .message-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 3px;
+            font-size: 0.7rem;
+            color: #666;
+        }
+
+        .message-sender {
+            font-weight: 600;
+            margin-bottom: 3px;
+            color: var(--dark);
+            font-size: 0.8rem;
+        }
+
+        .message-sender.you {
+            color: var(--secondary);
+        }
+
+        .input-container {
+            padding: 10px;
+            background-color: #f0f2f5;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .reply-preview {
+            width: 100%;
+            padding: 8px 12px;
+            background-color: var(--reply-bg);
+            border-left: 3px solid var(--primary);
+            border-radius: 5px;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            position: relative;
+            display: none;
+        }
+
+        .reply-preview .reply-sender {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .reply-preview .reply-text {
+            color: #555;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .close-reply {
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            cursor: pointer;
+            color: #888;
+            font-size: 0.8rem;
+        }
+
+        .input-area {
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .message-input {
+            flex-grow: 1;
+            padding: 10px 15px;
+            border-radius: 20px;
+            border: none;
+            outline: none;
+            font-size: 0.95rem;
+            background-color: white;
+        }
+
+        .send-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            margin-left: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .send-button:hover {
+            background-color: var(--secondary);
+        }
+
+        .timestamp {
+            text-align: center;
+            color: #666;
+            font-size: 0.75rem;
+            margin: 10px 0;
+            background-color: rgba(225, 245, 254, 0.5);
+            padding: 3px 10px;
+            border-radius: 15px;
+            align-self: center;
+        }
+
+        /* Quoted message in replies */
+        .quoted-message {
+            background-color: var(--reply-bg);
+            border-left: 3px solid var(--primary);
+            padding: 6px 10px;
+            border-radius: 5px;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+        }
+
+        .quoted-sender {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .quoted-text {
+            color: #555;
+        }
+
+        /* Name Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-content h3 {
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+
+        .name-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+
+        .submit-name {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.2s;
+        }
+
+        .submit-name:hover {
+            background-color: var(--secondary);
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 40%;
+            }
+            
+            .chat-area {
+                width: 60%;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .chat-container {
+                flex-direction: column;
+                height: 95vh;
+            }
+            
+            .sidebar, .chat-area {
+                width: 100%;
+            }
+            
+            .sidebar {
+                height: 40%;
+            }
+            
+            .chat-area {
+                height: 60%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="user-info">
+                    <div class="avatar" id="userInitial">?</div>
+                    <div>
+                        <div id="usernameDisplay">Guest</div>
+                        <div style="font-size: 0.7rem; color: #666;">Online</div>
+                    </div>
+                </div>
+                <div class="online-count">0 online</div>
+            </div>
+            
+            <div class="online-users" id="onlineUsers">
+                <div>Online Users:</div>
+                <div class="online-users-list" id="onlineUsersList"></div>
+            </div>
+            
+            <div class="group-list">
+                <div class="group-item active">
+                    <div class="group-avatar"><i class="fas fa-users"></i></div>
+                    <div class="group-info">
+                        <h4>Church Fellowship</h4>
+                        <p>Community chat room</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Chat Area -->
+        <div class="chat-area">
+            <div class="chat-header">
+                <div class="chat-info">
+                    <div class="group-avatar"><i class="fas fa-users"></i></div>
+                    <h3>Church Fellowship</h3>
+                </div>
+                <div class="chat-actions">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+            </div>
+            
+            <div class="messages-container" id="messagesContainer">
+                <div class="timestamp">Welcome to our church chat!</div>
+            </div>
+            
+            <div class="input-container">
+                <div class="reply-preview" id="replyPreview">
+                    <div class="reply-info">
+                        <span class="reply-sender" id="replySender"></span>
+                        <span class="reply-text" id="replyText"></span>
+                    </div>
+                    <span class="close-reply" id="closeReply">&times;</span>
+                </div>
+                <div class="input-area">
+                    <input type="text" class="message-input" placeholder="Type a message..." id="messageInput">
+                    <button class="send-button" id="sendButton">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Name Input Modal -->
+    <div class="modal-overlay" id="nameModal" style="display: none;">
+        <div class="modal-content">
+            <h3>Welcome to Church Chat!</h3>
+            <p>Please enter your name to join the conversation:</p>
+            <input type="text" class="name-input" id="nameInput" placeholder="Your name" maxlength="20">
+            <button class="submit-name" id="submitName">Join Chat</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
+    <script>
+        // Connect to Socket.io server
+        const socket = io('https://your-socketio-server.com', {
+            transports: ['websocket'],
+            withCredentials: true
+        });
+
+        // DOM Elements
+        const nameModal = document.getElementById('nameModal');
+        const nameInput = document.getElementById('nameInput');
+        const submitName = document.getElementById('submitName');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+        const messagesContainer = document.getElementById('messagesContainer');
+        const usernameDisplay = document.getElementById('usernameDisplay');
+        const userInitial = document.getElementById('userInitial');
+        const replyPreview = document.getElementById('replyPreview');
+        const replySender = document.getElementById('replySender');
+        const replyText = document.getElementById('replyText');
+        const closeReply = document.getElementById('closeReply');
+        const onlineUsersSection = document.getElementById('onlineUsers');
+        const onlineUsersList = document.getElementById('onlineUsersList');
+        const onlineCount = document.querySelector('.online-count');
+
+        // Variables
+        let username = localStorage.getItem('churchChatUsername');
+        let isAdmin = localStorage.getItem('churchChatAdmin') === 'true';
+        let replyingTo = null;
+        let onlineUsers = [];
+
+        // Check if username exists in localStorage
+        if (!username) {
+            nameModal.style.display = 'flex';
+        } else {
+            initializeUser();
+        }
+
+        function initializeUser() {
+            usernameDisplay.textContent = username;
+            userInitial.textContent = username.charAt(0).toUpperCase();
+            
+            // Add admin class if admin
+            if (isAdmin) {
+                userInitial.classList.add('admin-avatar');
+                onlineUsersSection.classList.add('admin-visible');
+            }
+            
+            socket.emit('user joined', { username, isAdmin });
+            addSystemMessage(`${username} has joined the chat`);
+        }
+
+        // Handle name submission
+        submitName.addEventListener('click', () => {
+            const name = nameInput.value.trim();
+            if (name) {
+                username = name;
+                localStorage.setItem('churchChatUsername', username);
+                
+                // For demo purposes - you would set this differently in production
+                isAdmin = name.toLowerCase() === 'admin';
+                if (isAdmin) {
+                    localStorage.setItem('churchChatAdmin', 'true');
+                }
+                
+                initializeUser();
+                nameModal.style.display = 'none';
+            }
+        });
+
+        // Handle sending messages
+        function sendMessage() {
+            const message = messageInput.value.trim();
+            if (message && username) {
+                const messageData = {
+                    sender: username,
+                    text: message,
+                    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    replyTo: replyingTo ? {
+                        sender: replyingTo.sender,
+                        text: replyingTo.text,
+                        messageId: replyingTo.messageId
+                    } : null
+                };
+                
+                // Emit message to server
+                socket.emit('chat message', messageData);
+                
+                // Add to local chat
+                addMessage(messageData, true);
+                
+                // Clear input and reply
+                messageInput.value = '';
+                clearReply();
+            }
+        }
+
+        // Add a message to the chat
+        function addMessage(messageData, isSent = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            messageDiv.dataset.messageId = Date.now(); // Unique ID for each message
+            
+            if(isSent) {
+                messageDiv.classList.add('sent');
+            } else {
+                messageDiv.classList.add('received');
+            }
+            
+            // Add quoted message if this is a reply
+            let quotedContent = '';
+            if (messageData.replyTo) {
+                quotedContent = `
+                    <div class="quoted-message">
+                        <div class="quoted-sender">${messageData.replyTo.sender}</div>
+                        <div class="quoted-text">${messageData.replyTo.text}</div>
+                    </div>
+                `;
+            }
+            
+            // Add sender name (show "You" for your own messages)
+            const senderContent = isSent ? 
+                `<div class="message-sender you">You</div>` : 
+                `<div class="message-sender">${messageData.sender}</div>`;
+            
+            messageDiv.innerHTML = `
+                ${senderContent}
+                ${quotedContent}
+                <div>${messageData.text}</div>
+                <div class="message-info">
+                    <span class="message-time">${messageData.timestamp}</span>
+                </div>
+            `;
+            
+            // Add click handler for replies (only for others' messages)
+            if (!isSent) {
+                messageDiv.addEventListener('click', () => {
+                    setReply(messageData.sender, messageData.text, messageDiv.dataset.messageId);
+                    // Highlight the message being replied to
+                    document.querySelectorAll('.message.highlighted').forEach(el => {
+                        el.classList.remove('highlighted');
+                    });
+                    messageDiv.classList.add('highlighted');
+                });
+            }
+            
+            messagesContainer.appendChild(messageDiv);
+            scrollToBottom();
+        }
+
+        // Set reply information
+        function setReply(sender, text, messageId) {
+            replyingTo = {
+                sender: sender,
+                text: text,
+                messageId: messageId
+            };
+            replySender.textContent = sender;
+            replyText.textContent = text;
+            replyPreview.style.display = 'block';
+            messageInput.focus();
+        }
+
+        // Clear reply information
+        function clearReply() {
+            replyingTo = null;
+            replyPreview.style.display = 'none';
+            document.querySelectorAll('.message.highlighted').forEach(el => {
+                el.classList.remove('highlighted');
+            });
+        }
+
+        // Update online users display
+        function updateOnlineUsers(users) {
+            onlineUsers = users;
+            onlineCount.textContent = `${users.length} online`;
+            
+            if (isAdmin) {
+                onlineUsersList.innerHTML = '';
+                users.forEach(user => {
+                    const userElement = document.createElement('div');
+                    userElement.className = `online-user ${user.isAdmin ? 'admin' : ''}`;
+                    userElement.innerHTML = `
+                        <div class="online-user-badge"></div>
+                        ${user.username} ${user.isAdmin ? '(Admin)' : ''}
+                    `;
+                    onlineUsersList.appendChild(userElement);
+                });
+            }
+        }
+
+        // Add system message
+        function addSystemMessage(text) {
+            const timestampDiv = document.createElement('div');
+            timestampDiv.classList.add('timestamp');
+            timestampDiv.textContent = text;
+            messagesContainer.appendChild(timestampDiv);
+            scrollToBottom();
+        }
+
+        // Scroll to bottom of chat
+        function scrollToBottom() {
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Event listeners
+        sendButton.addEventListener('click', sendMessage);
+        
+        messageInput.addEventListener('keypress', (e) => {
+            if(e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        closeReply.addEventListener('click', clearReply);
+
+        // Socket.io event listeners
+        socket.on('online users', (users) => {
+            updateOnlineUsers(users);
+        });
+
+        socket.on('chat message', (messageData) => {
+            // Only add if not our own message (we already added it)
+            if (messageData.sender !== username) {
+                addMessage(messageData);
+            }
+        });
+
+        socket.on('user joined', (user) => {
+            addSystemMessage(`${user.username} has joined the chat`);
+            if (isAdmin) {
+                updateOnlineUsers([...onlineUsers, user]);
+            } else {
+                onlineCount.textContent = `${onlineUsers.length + 1} online`;
+            }
+        });
+
+        socket.on('user left', (username) => {
+            addSystemMessage(`${username} has left the chat`);
+            if (isAdmin) {
+                updateOnlineUsers(onlineUsers.filter(u => u.username !== username));
+            } else {
+                onlineCount.textContent = `${Math.max(0, onlineUsers.length - 1)} online`;
+            }
+        });
+
+        // Handle beforeunload to notify when user leaves
+        window.addEventListener('beforeunload', () => {
+            if (username) {
+                socket.emit('user left', username);
+            }
+        });
+
+        // Initial system message
+        addSystemMessage('Chat room connected. Say hello to your church family!');
+    </script>
+</body>
+</html>

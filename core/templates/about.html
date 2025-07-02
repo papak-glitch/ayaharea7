@@ -1,0 +1,402 @@
+{% extends 'base.html' %}
+{% load static %}
+   <!-- Flash messages -->
+                {% if messages %}
+                <div class="message-container">
+                  {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                      {{ message }}
+                      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                  {% endfor %}
+                </div>
+              {% endif %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- About Header Card -->
+            <div class="card shadow-lg border-0 mb-5">
+                <div class="card-header bg-primary-green text-white">
+                    <h1 class="display-4 mb-0">
+                        <i class="fas fa-cross me-2"></i>
+                        About Area7 Youth
+                    </h1>
+                </div>
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <img src="{% static 'assets/images/arealogo.jpg' %}" 
+                                 class="img-fluid rounded shadow-sm" alt="Area7 Youth Logo">
+                        </div>
+                        <div class="col-md-6 mt-3 mt-md-0">
+                            <p class="lead">
+                               Area 7 is a Subdivision of the Anglican Youth Association of Harare Diocese (AYAH) which comprises of youths from Acturus,Chikurubi/Support,Damafalls,Goromonzi , Goromonzi turn off/Melfort, Mabvuku,Ruwa,Tafara, Zimre & East view
+
+<a href="https://chat.whatsapp.com/Dm7MXmD1IFMA6zfY69yKkI" target="_blank" rel="noopener" class="btn btn-success mb-3">
+    <i class="fab fa-whatsapp me-2"></i> Join our WhatsApp Group
+</a>
+                            </p>
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fas fa-calendar-check fa-2x text-primary-green me-3"></i>
+                                <div>
+                                    <h5 class="mb-0">Weekly Gatherings</h5>
+                                    <p class="mb-0 text-muted">Every Friday at 7:00 PM</p>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-map-marker-alt fa-2x text-primary-green me-3"></i>
+                                <div>
+                                    <h5 class="mb-0">Location</h5>
+                                    <p class="mb-0 text-muted">Church Sanctuary & Youth Hall</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Our Mission Section -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-primary-green text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-bullseye me-2"></i>
+                        Our Mission
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <div class="p-4 bg-light-green rounded">
+                                <h4 class="text-primary-green">
+                                    <i class="fas fa-hands-praying me-2"></i>
+                                    Spiritual Growth
+                                </h4>
+                                <p class="mb-0">
+                                    To help young people develop a deep, personal relationship with Jesus Christ through Bible study, prayer, and worship.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-4 bg-light-green rounded">
+                                <h4 class="text-primary-green">
+                                    <i class="fas fa-hands-helping me-2"></i>
+                                    Community Impact
+                                </h4>
+                                <p class="mb-0">
+                                    To serve our local community and demonstrate God's love through practical acts of service and outreach.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+           <!-- Leadership Team Section -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-primary-green text-white d-flex justify-content-between align-items-center">
+        <h3 class="mb-0">
+            <i class="fas fa-users me-2"></i>
+            Leadership Team
+        </h3>
+        {% if user.is_staff %}
+        <a href="/admin/core/leader/add/" class="btn btn-sm btn-light-green">
+            <i class="fas fa-plus me-1"></i> Add Leader
+        </a>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        <!-- Leadership Modal -->
+        <div class="modal fade" id="leaderModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header border-0">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <img id="modalLeaderImage" src="" class="img-fluid rounded-circle mb-3 shadow" 
+                             style="max-height: 300px; width: auto; object-fit: cover;" alt="Leader image">
+                        <h4 id="modalLeaderName" class="mb-1"></h4>
+                        <p id="modalLeaderPosition" class="text-primary-green mb-2"></p>
+                        <p id="modalLeaderBio" class="mb-3"></p>
+                        <a id="modalLeaderEmail" href="#" class="btn btn-primary-green me-2">
+                            <i class="fas fa-envelope me-1"></i> Email
+                        </a>
+                    </div>
+                    <div class="modal-footer border-0 justify-content-between">
+                        <button class="btn btn-primary-green" id="prevLeader">
+                            <i class="fas fa-chevron-left me-1"></i> Previous
+                        </button>
+                        {% if user.is_staff %}
+                        <a id="modalEditLeader" href="#" class="btn btn-outline-secondary">
+                            <i class="fas fa-edit me-1"></i> Edit
+                        </a>
+                        {% endif %}
+                        <button class="btn btn-primary-green" id="nextLeader">
+                            Next <i class="fas fa-chevron-right ms-1"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            {% for leader in leaders %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm clickable-leader" 
+                     data-leader-id="{{ leader.id }}"
+                     data-image-url="{{ leader.image.url }}"
+                     data-name="{{ leader.name }}"
+                     data-position="{{ leader.position }}"
+                     data-bio="{{ leader.bio }}"
+                     data-email="{{ leader.email }}"
+                     data-edit-url="/admin/core/leader/{{ leader.id }}/change/"
+                     data-index="{{ forloop.counter0 }}">
+                    <div class="card-body text-center">
+                        <img src="{{ leader.image.url }}" 
+                             class="rounded-circle mb-3 shadow-sm" 
+                             width="150" height="150" 
+                             style="object-fit: cover; cursor: pointer;"
+                             alt="{{ leader.name }}">
+                        <h5 class="mb-1">{{ leader.name }}</h5>
+                        <p class="text-primary-green mb-2">{{ leader.position }}</p>
+                        <p class="mb-3 small">{{ leader.bio|truncatewords:20 }}</p>
+                        <div class="mt-auto">
+                            <a href="mailto:{{ leader.email }}" class="btn btn-sm btn-primary-green me-2">
+                                <i class="fas fa-envelope me-1"></i> Email
+                            </a>
+                            {% if user.is_staff %}
+                            <a href="/admin/core/leader/{{ leader.id }}/change/"
+                               class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-edit me-1"></i> Edit
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-4">
+                <div class="alert alert-info">
+                    No leaders found. {% if user.is_staff %}<a href="{% url 'admin:core_leader_add' %}">Add one now</a>{% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+            <!-- Core Values -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary-green text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-heart me-2"></i>
+                        Our Core Values
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-group list-group-flush">
+                                {% for value in values|slice:":3" %}
+                                <li class="list-group-item d-flex align-items-center">
+                                    <span class="badge bg-primary-green rounded-pill me-3">{{ forloop.counter }}</span>
+                                    <div>
+                                        <h5 class="mb-1">{{ value.title }}</h5>
+                                        <p class="mb-0 text-muted">{{ value.description }}</p>
+                                    </div>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="col-md-6 mt-3 mt-md-0">
+                            <ul class="list-group list-group-flush">
+                                {% for value in values|slice:"3:" %}
+                                <li class="list-group-item d-flex align-items-center">
+                                    <span class="badge bg-primary-green rounded-pill me-3">{{ forloop.counter|add:3 }}</span>
+                                    <div>
+                                        <h5 class="mb-1">{{ value.title }}</h5>
+                                        <p class="mb-0 text-muted">{{ value.description }}</p>
+                                    </div>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-light-green {
+        background-color: var(--light-green);
+    }
+    
+    .text-primary-green {
+        color: var(--primary-green);
+    }
+    
+    .bg-primary-green {
+        background-color: var(--primary-green);
+    }
+    
+    .card {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    
+    .card-header {
+        padding: 1.25rem 1.5rem;
+    }
+    
+    .list-group-item {
+        border-left: none;
+        border-right: none;
+    }
+    
+    .list-group-item:first-child {
+        border-top: none;
+    }
+
+    .btn-light-green {
+        background-color: var(--light-green);
+        color: var(--dark-green);
+        border: none;
+    }
+    
+    .btn-light-green:hover {
+        background-color: var(--accent-green);
+        color: white;
+    }
+    
+    .leader-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .leader-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+     .clickable-leader {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        cursor: pointer;
+    }
+    .clickable-leader:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    }
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Get all leader cards
+    const leaderCards = document.querySelectorAll('.clickable-leader');
+    const modal = new bootstrap.Modal(document.getElementById('leaderModal'));
+    const modalImage = document.getElementById('modalLeaderImage');
+    const modalName = document.getElementById('modalLeaderName');
+    const modalPosition = document.getElementById('modalLeaderPosition');
+    const modalBio = document.getElementById('modalLeaderBio');
+    const modalEmail = document.getElementById('modalLeaderEmail');
+    const modalEdit = document.getElementById('modalEditLeader');
+    const prevBtn = document.getElementById('prevLeader');
+    const nextBtn = document.getElementById('nextLeader');
+    
+    let currentIndex = 0;
+    let leadersData = [];
+    
+    // Convert NodeList to Array and store leader data
+    leaderCards.forEach(card => {
+        leadersData.push({
+            id: card.dataset.leaderId,
+            imageUrl: card.dataset.imageUrl,
+            name: card.dataset.name,
+            position: card.dataset.position,
+            bio: card.dataset.bio,
+            email: card.dataset.email,
+            editUrl: card.dataset.editUrl,
+            index: parseInt(card.dataset.index)
+        });
+    });
+    
+    // Set up click handlers for all leader cards
+    leaderCards.forEach(card => {
+        card.addEventListener('click', function(e) {
+            // Don't open modal if clicking on links inside the card
+            if (e.target.tagName === 'A' || e.target.closest('a')) {
+                return;
+            }
+            
+            currentIndex = parseInt(this.dataset.index);
+            updateModal();
+            modal.show();
+        });
+    });
+    
+    // Navigation functions
+    function updateModal() {
+        const leader = leadersData[currentIndex];
+        modalImage.src = leader.imageUrl;
+        modalImage.alt = leader.name;
+        modalName.textContent = leader.name;
+        modalPosition.textContent = leader.position;
+        modalBio.textContent = leader.bio;
+        modalEmail.href = `mailto:${leader.email}`;
+        if (modalEdit) modalEdit.href = leader.editUrl;
+        
+        // Update button states
+        prevBtn.disabled = currentIndex === 0;
+        nextBtn.disabled = currentIndex === leadersData.length - 1;
+    }
+    
+    prevBtn.addEventListener('click', function() {
+        if (currentIndex > 0) {
+            currentIndex--;
+            updateModal();
+        }
+    });
+    
+    nextBtn.addEventListener('click', function() {
+        if (currentIndex < leadersData.length - 1) {
+            currentIndex++;
+            updateModal();
+        }
+    });
+    
+    // Keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (!modal._isShown) return;
+        
+        if (e.key === 'ArrowLeft' && currentIndex > 0) {
+            currentIndex--;
+            updateModal();
+        } else if (e.key === 'ArrowRight' && currentIndex < leadersData.length - 1) {
+            currentIndex++;
+            updateModal();
+        } else if (e.key === 'Escape') {
+            modal.hide();
+        }
+    });
+});
+// Auto-dismiss alerts after 3 seconds
+  setTimeout(function() {
+    let alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+      let fadeEffect = setInterval(() => {
+        if (!alert.style.opacity) {
+          alert.style.opacity = 1;
+        }
+        if (alert.style.opacity > 0) {
+          alert.style.opacity -= 0.1;
+        } else {
+          clearInterval(fadeEffect);
+          alert.remove();
+        }
+      }, 100);
+    });
+  }, 3000);  // 3000 milliseconds = 3 seconds
+</script>
+{% endblock %}

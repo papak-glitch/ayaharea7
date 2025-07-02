@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary-green text-black">
+                    <h3 class="mb-0">Create New Event</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="mb-4">
+                            <label for="eventTitle" class="form-label">Event Title</label>
+                            <input type="text" class="form-control" id="eventTitle" name="title" required>
+                            <div class="invalid-feedback">
+                                Please provide a title for the event.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="eventDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="eventDescription" name="description" rows="4" required></textarea>
+                            <div class="invalid-feedback">
+                                Please provide a description for the event.
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="eventDate" class="form-label">Date</label>
+                                <input type="date" class="form-control" id="eventDate" name="date" required>
+                                <div class="invalid-feedback">
+                                    Please select a date for the event.
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="eventTime" class="form-label">Time</label>
+                                <input type="time" class="form-control" id="eventTime" name="time" required>
+                                <div class="invalid-feedback">
+                                    Please select a time for the event.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="eventLocation" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="eventLocation" name="location" required>
+                            <div class="invalid-feedback">
+                                Please provide a location for the event.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="eventImage" class="form-label">Event Image</label>
+                            <input type="file" class="form-control" id="eventImage" name="image" accept="image/*">
+                            <small class="text-muted">Recommended size: 1200x630 pixels</small>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-primary-green px-4 py-2">
+                                <i class="fas fa-calendar-plus me-2"></i> Create Event
+                            </button>
+                            <a href="{% url 'core:home' %}" class="btn btn-outline-secondary px-4 py-2">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    
+    .card-header {
+        padding: 1.25rem 1.5rem;
+        font-weight: 600;
+    }
+    
+    .form-control, .form-select {
+        border-radius: 8px;
+        padding: 10px 15px;
+        border: 1px solid #ced4da;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: var(--accent-green);
+        box-shadow: 0 0 0 0.25rem rgba(32, 201, 151, 0.25);
+    }
+    
+    .btn-primary-green {
+        background-color: var(--primary-green);
+        border-color: var(--primary-green);
+        color: white;
+        font-weight: 500;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary-green:hover {
+        background-color: var(--dark-green);
+        border-color: var(--dark-green);
+        transform: translateY(-2px);
+    }
+    
+    .needs-validation .was-validated .form-control:invalid,
+    .needs-validation .form-control.is-invalid {
+        border-color: #dc3545;
+    }
+    
+    .needs-validation .was-validated .form-control:valid,
+    .needs-validation .form-control.is-valid {
+        border-color: #28a745;
+    }
+</style>
+
+<script>
+    // Client-side form validation
+    (function() {
+        'use strict';
+        window.addEventListener('load', function() {
+            var forms = document.getElementsByClassName('needs-validation');
+            var validation = Array.prototype.filter.call(forms, function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
+
+ // Auto-dismiss alerts after 3 seconds
+  setTimeout(function() {
+    let alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+      let fadeEffect = setInterval(() => {
+        if (!alert.style.opacity) {
+          alert.style.opacity = 1;
+        }
+        if (alert.style.opacity > 0) {
+          alert.style.opacity -= 0.1;
+        } else {
+          clearInterval(fadeEffect);
+          alert.remove();
+        }
+      }, 100);
+    });
+  }, 3000);  // 3000 milliseconds = 3 seconds   
+</script>
+{% endblock %}

@@ -1,0 +1,329 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-4 flex-column text-center">
+                        {% if event.image %}
+                        <img src="{{ event.image.url }}" class="rounded mb-3" alt="{{ event.title }}" style="width: 300px; height: 300px; object-fit: cover;">
+                        {% endif %}
+                        <h1 class="card-title display-6 mb-2">{{ event.title }}</h1>
+                        <div class="mb-2">
+                            <span class="me-2">
+                                <i class="fas fa-calendar-day me-1"></i>
+                                {{ event.date|date:"l, F j, Y" }}
+                            </span>
+                        </div>
+                        <div class="mb-2">
+                            <i class="fas fa-map-marker-alt me-2 text-primary-green"></i>
+                            <span class="fw-semibold">Location:</span>
+                            <span>{{ event.location }}</span>
+                        </div>
+                        <div class="mb-2">
+                            <i class="fas fa-clock me-1 text-primary-green"></i>
+                            {{ event.time|time:"g:i A" }}
+                        </div>
+                        <div class="mb-3 w-100">
+                            <h5 class="mb-2 text-primary-green text-start">
+                                <i class="fas fa-info-circle me-2"></i>
+                                About This Event
+                            </h5>
+                            <div class="event-description fs-5 text-start">
+                                {{ event.description|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{% url 'core:home' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i> Back to Events
+                        </a>
+                        <div>
+                            <a href="#" class="btn btn-primary-green me-2">
+                                <i class="fas fa-share-alt me-1"></i> Share
+                            </a>
+                            <a href="#" class="btn btn-accent-green">
+                                <i class="fas fa-calendar-plus me-1"></i> Add to Calendar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+       <!-- Comment Section -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-primary-green text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-comments me-2"></i>
+                        <span style="color: black;">Discussions ({{ comments.paginator.count }})</span>
+                    </h4>
+                </div>
+                
+                <!-- Comment Form -->
+<div class="card-body border-bottom">
+    <form method="post" action="{% url 'core:add_comment' event.pk %}">
+        {% csrf_token %}
+        <div class="mb-3">
+            {% if not request.session.commenter_name %}
+                <input type="text" name="author_name" class="form-control mb-2" placeholder="Your Name" required>
+            {% endif %}
+            <textarea class="form-control" name="text" rows="3" placeholder="Share your thoughts..." required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary-green float-end comment-submit-btn" style="background-color: #1aa179; color: #fff; border: none;">
+            <i class="fas fa-paper-plane me-1"></i> Post Comment
+        </button>
+    </form>
+</div>
+
+                
+                <!-- Comments List -->
+<div class="list-group list-group-flush">
+    {% for comment in comments %}
+    <div class="list-group-item {% if comment.is_reply %}ms-5 border-start border-primary{% endif %} py-3">
+        <div class="d-flex">
+            <div class="flex-shrink-0">
+                <img src="{% static 'assets/images/blank.jpg' %}" 
+                     class="rounded-circle me-3" width="50" height="50" alt="">
+            </div>
+            <div class="flex-grow-1 ms-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h6 class="mb-1 fw-bold">{{ comment.author_name }}</h6>
+                    <small class="text-muted">{{ comment.created_at|timesince }} ago</small>
+                </div>
+                <p class="mb-2">{{ comment.text }}</p>
+                
+                <!-- Action Links -->
+                <div class="d-flex gap-3 mt-2">
+                    <a href="#" class="text-muted small toggle-reply-form">
+                        <i class="fas fa-reply me-1"></i> Reply
+                    </a>
+                    {% if comment.replies.count > 0 %}
+                        {% if load_replies_for == comment.id|stringformat:"i" %}
+                            <a href="?page={{ comments.number }}" class="text-muted small">
+                                <i class="fas fa-eye-slash me-1"></i> Hide Replies
+                            </a>
+                        {% else %}
+                            <a href="?show_replies={{ comment.id }}" class="text-muted small">
+                                <i class="fas fa-eye me-1"></i> Show Replies ({{ comment.replies.count }})
+                            </a>
+                        {% endif %}
+                    {% endif %}
+                    
+                    {% if request.user == comment.author_name or request.user.is_staff %}
+                    <form method="post" action="{% url 'core:delete_comment' comment.pk %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-link text-danger p-0 small" 
+                                onclick="return confirm('Are you sure you want to delete this comment?')">
+                            <i class="fas fa-trash-alt me-1"></i> Delete
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+                
+                <!-- Reply Form (hidden by default) -->
+                <div class="reply-form mt-3" style="display: none;">
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="parent_id" value="{{ comment.id }}">
+                        {% if not request.session.commenter_name %}
+                            <input type="text" name="author_name" class="form-control mb-2" placeholder="Your Name" required>
+                        {% endif %}
+                        <textarea name="text" class="form-control" rows="2" placeholder="Write your reply..." required></textarea>
+                        <button type="submit" class="btn btn-sm btn-primary-green mt-2">
+                            <i class="fas fa-reply me-1"></i> Post Reply
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Replies Section -->
+                {% if load_replies_for == comment.id|stringformat:"i" %}
+                <div class="replies mt-3">
+                    {% for reply in comment.replies.all %}
+                    <div class="list-group-item mt-2 ms-4 ps-3 border-start border-primary">
+                        <div class="d-flex">
+                            <div class="flex-shrink-0">
+                                <img src="{% static 'assets/images/logo2.jpg' %}" 
+                                     class="rounded-circle me-3" width="40" height="40" alt="">
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h6 class="mb-1 fw-bold">{{ reply.author_name }}</h6>
+                                    <small class="text-muted">{{ reply.created_at|timesince }} ago</small>
+                                </div>
+                                <p class="mb-2">{{ reply.text }}</p>
+                                
+                                <div class="d-flex gap-3 mt-2">
+                                    {% if request.user == reply.author_name or request.user.is_staff %}
+                                    <form method="post" action="{% url 'core:delete_comment' reply.pk %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-link text-danger p-0 small"
+                                                onclick="return confirm('Are you sure you want to delete this reply?')">
+                                            <i class="fas fa-trash-alt me-1"></i> Delete
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="list-group-item text-center py-4 text-muted">
+        No comments yet. Be the first to share your thoughts!
+    </div>
+    {% endfor %}
+</div>
+                
+                <!-- Pagination -->
+                {% if comments.has_next %}
+                <div class="card-footer text-center bg-transparent">
+                    <a href="?page={{ comments.next_page_number }}{% if load_replies_for %}&show_replies={{ load_replies_for }}{% endif %}" 
+                       class="btn btn-primary-green">
+                        Load More Comments <i class="fas fa-chevron-down ms-1"></i>
+                    </a>   
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>  
+
+<style>
+
+    .list-group-item {
+        border-radius: 8px;
+        margin-bottom: 12px;
+        border: 1px solid #eee;
+    }
+    .replies .list-group-item {
+        background-color: #f9f9f9;
+        border-left-width: 3px;
+    }
+    .btn-primary-green {
+        background-color: #1aa179;
+        color: white;
+    }
+    .btn-primary-green:hover {
+        background-color: #168e6b;
+    } 
+     .comment-submit-btn:hover {
+                                background-color: #168e6b !important;
+                                color: #fff !important;
+                            }
+    .bg-light-green {
+        background-color: var(--light-green);
+    }
+    
+    .text-primary-green {
+        color: var(--primary-green);
+    }
+    
+    .btn-accent-green {
+        background-color: var(--accent-green);
+        color: white;
+        border: none;
+    }
+    
+    .btn-accent-green:hover {
+        background-color: #1aa179;
+        color: white;
+    }
+    
+    .event-description {
+        line-height: 1.8;
+    }
+    
+    .card {
+        border-radius: 12px;
+        overflow: hidden;
+        border: none;
+    }
+    
+    .card-img-top {
+        border-bottom: 4px solid var(--primary-green);
+    }
+
+    .toggle-reply-form {
+        cursor: pointer;
+    }
+    .toggle-reply-form:hover {
+        color: var(--primary-green) !important;
+    }
+    .border-primary {
+        border-color: var(--primary-green) !important;
+    }
+.toggle-reply-form {
+        cursor: pointer;
+    }
+    .toggle-reply-form:hover {
+        color: var(--primary-green) !important;
+    }
+    .border-primary {
+        border-color: var(--primary-green) !important;
+    }
+    .replies {
+        border-left: 2px solid var(--primary-green);
+        padding-left: 15px;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Simple JavaScript to toggle reply forms (optional)
+    document.querySelectorAll('.toggle-reply-form').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const form = this.closest('.list-group-item').querySelector('.reply-form');
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        });
+    });
+});
+
+ // In your template's JavaScript
+document.querySelectorAll('form[action*="delete_comment"]').forEach(form => {
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        if (confirm('Are you sure you want to delete this?')) {
+            fetch(this.action, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': this.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'Accept': 'application/json',
+                },
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw err; });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Smooth removal animation
+                    let element = this.closest('.list-group-item');
+                    if (element) {
+                        element.style.transition = 'opacity 0.3s';
+                        element.style.opacity = '0';
+                        setTimeout(() => element.remove(), 300);
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert(error.error || 'An error occurred while deleting.');
+            });
+        }
+    });
+});
+</script>
+{% endblock %}
+

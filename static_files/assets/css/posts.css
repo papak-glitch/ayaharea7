@@ -1,0 +1,55 @@
+/* Custom styles for create post page */
+.card {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.card-header {
+    padding: 1.5rem;
+}
+
+.form-control, .form-select {
+    border-radius: 5px;
+    padding: 10px 15px;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.btn {
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-weight: 500;
+}
+
+/* navigation bar styles */
+.nav-link form {
+    display: inline;
+}
+
+.nav-link button {
+    color: inherit;
+    text-decoration: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+}
+
+.nav-link button:hover {
+    color: rgba(255,255,255,0.75);
+}
+
+/* CKEditor customization */
+.cke_chrome {
+    border-radius: 5px !important;
+    border: 1px solid #ced4da !important;
+    box-shadow: none !important;
+}
+
+.cke_top {
+    background: #f8f9fa !important;
+    border-bottom: 1px solid #ced4da !important;
+}
