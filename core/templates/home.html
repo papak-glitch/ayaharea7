@@ -172,6 +172,91 @@
         margin-bottom: 20px;
     }
 
+    .card.h-100.shadow-sm {
+        cursor: pointer;
+        transition: box-shadow 0.2s, transform 0.2s;
+    }
+
+    .card.h-100.shadow-sm:hover {
+        box-shadow: 0 8px 32px rgba(40, 167, 69, 0.18), 0 1.5px 6px rgba(0, 0, 0, 0.08);
+        transform: translateY(-3px) scale(1.02);
+    }
+
+    .btn-highlight-box:hover,
+    .btn-highlight-box:focus {
+        box-shadow: 0 0 0 3px var(--primary-green, #28a745);
+        outline: none;
+        transition: box-shadow 0.2s;
+    }
+
+    .card-link-wrapper {
+        display: block;
+    }
+
+    /* Like/Dislike Button Styles */
+    .like-dislike-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 15px;
+        background-color: #f8f9fa;
+        border-top: 1px solid #e9ecef;
+    }
+
+    .like-dislike-buttons {
+        display: flex;
+        gap: 15px;
+    }
+
+    .like-btn,
+    .dislike-btn {
+        background: none;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 20px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .like-btn {
+        color: #28a745;
+    }
+
+    .like-btn:hover {
+        background-color: rgba(40, 167, 69, 0.1);
+        color: #28a745;
+    }
+
+    .like-btn.active {
+        background-color: #28a745;
+        color: white;
+    }
+
+    .dislike-btn {
+        color: #dc3545;
+    }
+
+    .dislike-btn:hover {
+        background-color: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
+    }
+
+    .dislike-btn.active {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .like-count,
+    .dislike-count {
+        font-weight: 500;
+        min-width: 20px;
+        text-align: center;
+    }
+
     @media (max-width: 768px) {
         .hero-title {
             font-size: 2.5rem;
@@ -179,6 +264,10 @@
 
         .hero-subtitle {
             font-size: 1rem;
+        }
+
+        .like-dislike-buttons {
+            gap: 10px;
         }
     }
 </style>
@@ -203,31 +292,19 @@
 
 <div class="container py-4">
     <!-- Upcoming Events Section -->
-    <!-- Add this to your home.html template -->
     <div class="container my-5">
         <h2 class="mb-4">Upcoming Events</h2>
         <div class="row">
-            <style>
-                .card.h-100.shadow-sm {
-                    cursor: pointer;
-                    transition: box-shadow 0.2s, transform 0.2s;
-                }
-
-                .card.h-100.shadow-sm:hover {
-                    box-shadow: 0 8px 32px rgba(40, 167, 69, 0.18), 0 1.5px 6px rgba(0, 0, 0, 0.08);
-                    transform: translateY(-3px) scale(1.02);
-                }
-            </style>
             {% for event in upcoming_events %}
             <div class="col-md-4 mb-4">
-                <a href="{% url 'core:event_detail' event.pk %}" class="card-link-wrapper"
-                    style="text-decoration: none; color: inherit;">
-                    <div class="card h-100 shadow-sm">
-                        {% if event.image %}
-                        <img src="{{ event.image.url }}" class="card-img-top" alt="{{ event.title }}"
-                            style="height: 180px; object-fit: cover;">
-                        {% endif %}
-                        <div class="card-body">
+                <div class="card h-100 shadow-sm" data-event-id="{{ event.pk }}">
+                    {% if event.image %}
+                    <img src="{{ event.image.url }}" class="card-img-top" alt="{{ event.title }}"
+                        style="height: 180px; object-fit: cover;">
+                    {% endif %}
+                    <div class="card-body">
+                        <a href="{% url 'core:event_detail' event.pk %}" class="card-link-wrapper"
+                            style="text-decoration: none; color: inherit;">
                             <h5 class="card-title">{{ event.title }}</h5>
                             <p class="text-muted mb-2">
                                 <i class="fas fa-calendar-day me-2"></i>{{ event.date }} at {{ event.time}}
@@ -236,24 +313,27 @@
                                 <i class="fas fa-map-marker-alt me-2"></i>{{ event.location }}
                             </p>
                             <p class="card-text">{{ event.description|truncatewords:20 }}</p>
+                        </a>
+                    </div>
+                    <div class="card-footer bg-white p-0">
+                        <div class="p-3">
+                            <a href="{% url 'core:event_detail' event.pk %}"
+                                class="btn btn-sm btn-primary-green btn-highlight-box">Details</a>
                         </div>
-                        <div class="card-footer bg-white">
-                            <span class="btn btn-sm btn-primary-green btn-highlight-box">Details</span>
-                            <style>
-                                .btn-highlight-box:hover,
-                                .btn-highlight-box:focus {
-                                    box-shadow: 0 0 0 3px var(--primary-green, #28a745);
-                                    outline: none;
-                                    transition: box-shadow 0.2s;
-                                }
-
-                                .card-link-wrapper {
-                                    display: block;
-                                }
-                            </style>
+                        <div class="like-dislike-section">
+                            <div class="like-dislike-buttons">
+                                <button class="like-btn" onclick="toggleLike('{{ event.pk }}', 'like')">
+                                    <i class="fas fa-thumbs-up"></i>
+                                    <span class="like-count" id="like-count-{{ event.pk }}">0</span>
+                                </button>
+                                <button class="dislike-btn" onclick="toggleLike('{{ event.pk }}', 'dislike')">
+                                    <i class="fas fa-thumbs-down"></i>
+                                    <span class="dislike-count" id="dislike-count-{{ event.pk }}">0</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </a>
+                </div>
             </div>
             {% empty %}
             <div class="col-12">
@@ -262,6 +342,7 @@
             {% endfor %}
         </div>
     </div>
+
     <div class="d-flex justify-content-end p-2">
         {% if user.is_staff %}
         <a href="{% url 'core:event_create' %}" class="btn btn-success btn-sm">
@@ -269,11 +350,12 @@
         </a>
         {% endif %}
     </div>
+
     <h2 class="mb-4 mt-5">Recent Events</h2>
     <div class="row">
         {% for event in recent_events %}
         <div class="col-md-4 mb-4">
-            <div class="card h-100 shadow-sm">
+            <div class="card h-100 shadow-sm" data-event-id="{{ event.pk }}">
                 {% if event.image %}
                 <img src="{{ event.image.url }}" class="card-img-top" alt="{{ event.title }}"
                     style="height: 180px; object-fit: cover; filter: grayscale(20%); opacity: 0.9;">
@@ -288,8 +370,23 @@
                     </p>
                     <p class="card-text">{{ event.description|truncatewords:20 }}</p>
                 </div>
-                <div class="card-footer bg-white">
-                    <a href="#" class="btn btn-sm btn-outline-secondary">View Recap</a>
+                <div class="card-footer bg-white p-0">
+                    <div class="p-3">
+                        <a href="{% url 'core:event_detail' event.pk %}" class="btn btn-sm btn-outline-secondary">View
+                            Recap</a>
+                    </div>
+                    <div class="like-dislike-section">
+                        <div class="like-dislike-buttons">
+                            <button class="like-btn" onclick="toggleLike('{{ event.pk }}', 'like')">
+                                <i class="fas fa-thumbs-up"></i>
+                                <span class="like-count" id="like-count-{{ event.pk }}">0</span>
+                            </button>
+                            <button class="dislike-btn" onclick="toggleLike('{{ event.pk }}', 'dislike')">
+                                <i class="fas fa-thumbs-down"></i>
+                                <span class="dislike-count" id="dislike-count-{{ event.pk }}">0</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -300,4 +397,120 @@
         {% endfor %}
     </div>
 </div>
+
+<script>
+    // Store likes/dislikes per device using localStorage
+    function getStorageKey(eventId, type) {
+        return `event_${eventId}_${type}`;
+    }
+
+    function getDeviceId() {
+        let deviceId = localStorage.getItem('device_id');
+        if (!deviceId) {
+            deviceId = 'device_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+            localStorage.setItem('device_id', deviceId);
+        }
+        return deviceId;
+    }
+
+    function getUserReaction(eventId) {
+        const deviceId = getDeviceId();
+        const liked = localStorage.getItem(`${getStorageKey(eventId, 'liked')}_${deviceId}`) === 'true';
+        const disliked = localStorage.getItem(`${getStorageKey(eventId, 'disliked')}_${deviceId}`) === 'true';
+        return { liked, disliked };
+    }
+
+    function setUserReaction(eventId, type, value) {
+        const deviceId = getDeviceId();
+        localStorage.setItem(`${getStorageKey(eventId, type)}_${deviceId}`, value.toString());
+    }
+
+    function getLikeCounts(eventId) {
+        const likes = parseInt(localStorage.getItem(getStorageKey(eventId, 'likes')) || '0');
+        const dislikes = parseInt(localStorage.getItem(getStorageKey(eventId, 'dislikes')) || '0');
+        return { likes, dislikes };
+    }
+
+    function setLikeCounts(eventId, likes, dislikes) {
+        localStorage.setItem(getStorageKey(eventId, 'likes'), likes.toString());
+        localStorage.setItem(getStorageKey(eventId, 'dislikes'), dislikes.toString());
+    }
+
+    function updateButtonStates(eventId) {
+        const { liked, disliked } = getUserReaction(eventId);
+        const likeBtn = document.querySelector(`[data-event-id="${eventId}"] .like-btn`);
+        const dislikeBtn = document.querySelector(`[data-event-id="${eventId}"] .dislike-btn`);
+
+        if (likeBtn) {
+            likeBtn.classList.toggle('active', liked);
+        }
+        if (dislikeBtn) {
+            dislikeBtn.classList.toggle('active', disliked);
+        }
+    }
+
+    function updateCountDisplays(eventId) {
+        const { likes, dislikes } = getLikeCounts(eventId);
+        const likeCountEl = document.getElementById(`like-count-${eventId}`);
+        const dislikeCountEl = document.getElementById(`dislike-count-${eventId}`);
+
+        if (likeCountEl) likeCountEl.textContent = likes;
+        if (dislikeCountEl) dislikeCountEl.textContent = dislikes;
+    }
+
+    function toggleLike(eventId, action) {
+        const { liked, disliked } = getUserReaction(eventId);
+        let { likes, dislikes } = getLikeCounts(eventId);
+
+        if (action === 'like') {
+            if (liked) {
+                // Unlike
+                likes = Math.max(0, likes - 1);
+                setUserReaction(eventId, 'liked', false);
+            } else {
+                // Like
+                likes += 1;
+                setUserReaction(eventId, 'liked', true);
+
+                // Remove dislike if exists
+                if (disliked) {
+                    dislikes = Math.max(0, dislikes - 1);
+                    setUserReaction(eventId, 'disliked', false);
+                }
+            }
+        } else if (action === 'dislike') {
+            if (disliked) {
+                // Remove dislike
+                dislikes = Math.max(0, dislikes - 1);
+                setUserReaction(eventId, 'disliked', false);
+            } else {
+                // Dislike
+                dislikes += 1;
+                setUserReaction(eventId, 'disliked', true);
+
+                // Remove like if exists
+                if (liked) {
+                    likes = Math.max(0, likes - 1);
+                    setUserReaction(eventId, 'liked', false);
+                }
+            }
+        }
+
+        setLikeCounts(eventId, likes, dislikes);
+        updateButtonStates(eventId);
+        updateCountDisplays(eventId);
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function () {
+        // Get all event cards
+        const eventCards = document.querySelectorAll('[data-event-id]');
+
+        eventCards.forEach(card => {
+            const eventId = card.getAttribute('data-event-id');
+            updateButtonStates(eventId);
+            updateCountDisplays(eventId);
+        });
+    });
+</script>
 {% endblock %}
