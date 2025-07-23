@@ -326,3 +326,76 @@ def download_images(request):
     response['Content-Disposition'] = 'attachment; filename="selected_images.zip"'
     return response
 
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
+from django.shortcuts import get_object_or_404
+from django.db.models import Count, Q
+import json
+from .models import Event, EventLike
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def event_like(request, event_id):
+    """Handle like/dislike actions for events"""
+    try:
+        event = get_object_or_404(Event, id=event_id)
+        data = json.loads(request.body)
+        
+        device_id = data.get('device_id')
+        action = data.get('action')  # 'like' or 'dislike'
+        is_adding = data.get('is_adding', True)
+        
+        if not device_id or action not in ['like', 'dislike']:
+            return JsonResponse({'error': 'Invalid data'}, status=400)
+        
+        # Get or create the reaction record
+        reaction, created = EventLike.objects.get_or_create(
+            event=event,
+            device_id=device_id,
+            defaults={'reaction': action}
+        )
+        
+        if not created:
+            if is_adding:
+                # Update existing reaction
+                reaction.reaction = action
+                reaction.save()
+            else:
+                # Remove reaction
+                reaction.delete()
+        
+        # Get updated counts
+        counts = event.reactions.aggregate(
+            likes=Count('id', filter=Q(reaction='like')),
+            dislikes=Count('id', filter=Q(reaction='dislike'))
+        )
+        
+        return JsonResponse({
+            'success': True,
+            'likes': counts['likes'] or 0,
+            'dislikes': counts['dislikes'] or 0
+        })
+        
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@require_http_methods(["GET"])
+def event_likes_count(request, event_id):
+    """Get current like/dislike counts for an event"""
+    try:
+        event = get_object_or_404(Event, id=event_id)
+        
+        counts = event.reactions.aggregate(
+            likes=Count('id', filter=Q(reaction='like')),
+            dislikes=Count('id', filter=Q(reaction='dislike'))
+        )
+        
+        return JsonResponse({
+            'likes': counts['likes'] or 0,
+            'dislikes': counts['dislikes'] or 0
+        })
+        
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
