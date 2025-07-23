@@ -399,11 +399,7 @@
 </div>
 
 <script>
-    // Store likes/dislikes per device using localStorage
-    function getStorageKey(eventId, type) {
-        return `event_${eventId}_${type}`;
-    }
-
+    // Get device ID for tracking user's personal likes/dislikes
     function getDeviceId() {
         let deviceId = localStorage.getItem('device_id');
         if (!deviceId) {
@@ -413,29 +409,21 @@
         return deviceId;
     }
 
+    // Get user's personal reaction from localStorage
     function getUserReaction(eventId) {
         const deviceId = getDeviceId();
-        const liked = localStorage.getItem(`${getStorageKey(eventId, 'liked')}_${deviceId}`) === 'true';
-        const disliked = localStorage.getItem(`${getStorageKey(eventId, 'disliked')}_${deviceId}`) === 'true';
+        const liked = localStorage.getItem(`event_${eventId}_liked_${deviceId}`) === 'true';
+        const disliked = localStorage.getItem(`event_${eventId}_disliked_${deviceId}`) === 'true';
         return { liked, disliked };
     }
 
+    // Set user's personal reaction in localStorage
     function setUserReaction(eventId, type, value) {
         const deviceId = getDeviceId();
-        localStorage.setItem(`${getStorageKey(eventId, type)}_${deviceId}`, value.toString());
+        localStorage.setItem(`event_${eventId}_${type}_${deviceId}`, value.toString());
     }
 
-    function getLikeCounts(eventId) {
-        const likes = parseInt(localStorage.getItem(getStorageKey(eventId, 'likes')) || '0');
-        const dislikes = parseInt(localStorage.getItem(getStorageKey(eventId, 'dislikes')) || '0');
-        return { likes, dislikes };
-    }
-
-    function setLikeCounts(eventId, likes, dislikes) {
-        localStorage.setItem(getStorageKey(eventId, 'likes'), likes.toString());
-        localStorage.setItem(getStorageKey(eventId, 'dislikes'), dislikes.toString());
-    }
-
+    // Update button visual states based on user's reactions
     function updateButtonStates(eventId) {
         const { liked, disliked } = getUserReaction(eventId);
         const likeBtn = document.querySelector(`[data-event-id="${eventId}"] .like-btn`);
@@ -449,8 +437,22 @@
         }
     }
 
-    function updateCountDisplays(eventId) {
-        const { likes, dislikes } = getLikeCounts(eventId);
+    // Fetch counts from server
+    async function fetchCounts(eventId) {
+        try {
+            const response = await fetch(`/api/event/${eventId}/likes/`);
+            if (response.ok) {
+                const data = await response.json();
+                return { likes: data.likes || 0, dislikes: data.dislikes || 0 };
+            }
+        } catch (error) {
+            console.log('Could not fetch counts from server');
+        }
+        return { likes: 0, dislikes: 0 };
+    }
+
+    // Update count displays
+    function updateCountDisplays(eventId, likes, dislikes) {
         const likeCountEl = document.getElementById(`like-count-${eventId}`);
         const dislikeCountEl = document.getElementById(`dislike-count-${eventId}`);
 
@@ -458,59 +460,110 @@
         if (dislikeCountEl) dislikeCountEl.textContent = dislikes;
     }
 
-    function toggleLike(eventId, action) {
+    // Send like/dislike to server
+    async function sendToServer(eventId, action, isAdding) {
+        try {
+            const response = await fetch(`/api/event/${eventId}/like/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || getCookie('csrftoken'),
+                },
+                body: JSON.stringify({
+                    action: action,
+                    is_adding: isAdding,
+                    device_id: getDeviceId()
+                })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                updateCountDisplays(eventId, data.likes, data.dislikes);
+                return true;
+            }
+        } catch (error) {
+            console.log('Could not sync with server');
+        }
+        return false;
+    }
+
+    // Get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Main toggle function
+    async function toggleLike(eventId, action) {
         const { liked, disliked } = getUserReaction(eventId);
-        let { likes, dislikes } = getLikeCounts(eventId);
+        let isAdding = false;
 
         if (action === 'like') {
             if (liked) {
                 // Unlike
-                likes = Math.max(0, likes - 1);
                 setUserReaction(eventId, 'liked', false);
+                isAdding = false;
             } else {
                 // Like
-                likes += 1;
                 setUserReaction(eventId, 'liked', true);
+                isAdding = true;
 
                 // Remove dislike if exists
                 if (disliked) {
-                    dislikes = Math.max(0, dislikes - 1);
                     setUserReaction(eventId, 'disliked', false);
+                    await sendToServer(eventId, 'dislike', false);
                 }
             }
         } else if (action === 'dislike') {
             if (disliked) {
                 // Remove dislike
-                dislikes = Math.max(0, dislikes - 1);
                 setUserReaction(eventId, 'disliked', false);
+                isAdding = false;
             } else {
                 // Dislike
-                dislikes += 1;
                 setUserReaction(eventId, 'disliked', true);
+                isAdding = true;
 
                 // Remove like if exists
                 if (liked) {
-                    likes = Math.max(0, likes - 1);
                     setUserReaction(eventId, 'liked', false);
+                    await sendToServer(eventId, 'like', false);
                 }
             }
         }
 
-        setLikeCounts(eventId, likes, dislikes);
+        // Update button states immediately
         updateButtonStates(eventId);
-        updateCountDisplays(eventId);
+
+        // Send to server
+        await sendToServer(eventId, action, isAdding);
     }
 
     // Initialize on page load
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', async function () {
         // Get all event cards
         const eventCards = document.querySelectorAll('[data-event-id]');
 
-        eventCards.forEach(card => {
+        for (const card of eventCards) {
             const eventId = card.getAttribute('data-event-id');
+
+            // Update button states based on user's local preferences
             updateButtonStates(eventId);
-            updateCountDisplays(eventId);
-        });
+
+            // Fetch and display current counts from server
+            const { likes, dislikes } = await fetchCounts(eventId);
+            updateCountDisplays(eventId, likes, dislikes);
+        }
     });
 </script>
 {% endblock %}

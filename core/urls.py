@@ -24,5 +24,7 @@ urlpatterns = [
     path('comment/<int:pk>/delete/', views.delete_comment, name='delete_comment'),
     path('<int:pk>/comment/', add_comment, name='add_comment'),
     path('download-images/', download_images, name='download_images'),
+    path('api/event/<int:event_id>/like/', views.event_like, name='event_like'),
+    path('api/event/<int:event_id>/likes/', views.event_likes_count, name='event_likes_count'),
     
 ]

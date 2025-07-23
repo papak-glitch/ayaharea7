@@ -21,6 +21,14 @@ from django.db import models
 from django.db import models
 
 
+
+# models.py
+
+from django.db import models
+from django.urls import reverse
+from django.utils import timezone
+from django.db.models import Count, Q
+
 class Event(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
@@ -42,8 +50,74 @@ class Event(models.Model):
         today = timezone.now().date()
         return self.date >= today
 
+    @property
+    def like_counts(self):
+        """Get like and dislike counts for this event"""
+        counts = self.reactions.aggregate(
+            likes=Count('id', filter=Q(reaction='like')),
+            dislikes=Count('id', filter=Q(reaction='dislike'))
+        )
+        return {
+            'likes': counts['likes'] or 0,
+            'dislikes': counts['dislikes'] or 0
+        }
+
+    @property
+    def total_likes(self):
+        """Get total number of likes"""
+        return self.reactions.filter(reaction='like').count()
+
+    @property
+    def total_dislikes(self):
+        """Get total number of dislikes"""
+        return self.reactions.filter(reaction='dislike').count()
+
+    def get_user_reaction(self, device_id):
+        """Get the reaction (like/dislike) for a specific device"""
+        try:
+            reaction = self.reactions.get(device_id=device_id)
+            return reaction.reaction
+        except EventLike.DoesNotExist:
+            return None
+
+    def has_user_liked(self, device_id):
+        """Check if a device has liked this event"""
+        return self.reactions.filter(device_id=device_id, reaction='like').exists()
+
+    def has_user_disliked(self, device_id):
+        """Check if a device has disliked this event"""
+        return self.reactions.filter(device_id=device_id, reaction='dislike').exists()
+
     class Meta:
         ordering = ['date', 'time']
+
+
+class EventLike(models.Model):
+    REACTION_CHOICES = [
+        ('like', 'Like'),
+        ('dislike', 'Dislike'),
+    ]
+    
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='reactions')
+    device_id = models.CharField(max_length=100, help_text="Unique identifier for the device/browser")
+    reaction = models.CharField(max_length=10, choices=REACTION_CHOICES)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        unique_together = ['event', 'device_id']  # One reaction per device per event
+        indexes = [
+            models.Index(fields=['event', 'reaction']),  # For faster count queries
+            models.Index(fields=['device_id']),
+        ]
+    
+    def __str__(self):
+        return f"{self.device_id} {self.reaction}d {self.event.title}"
+
+    def save(self, *args, **kwargs):
+        # Ensure reaction is lowercase
+        self.reaction = self.reaction.lower()
+        super().save(*args, **kwargs)
 
 from django.contrib.auth import get_user_model
 User = get_user_model()
