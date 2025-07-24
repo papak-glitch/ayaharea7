@@ -24,9 +24,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-vah=i#--ey3zkog*_j&qv-e1o_$%$fn%fdvn#c^(%zfc_a-xh4'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['ayahare7.pythonanywhere.com']
 
 
 # Application definition
@@ -42,6 +42,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # For serving static files in production
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -133,10 +134,12 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
-STATIC_DIR = os.path.join(BASE_DIR, 'static_files')
+#STATIC_DIR = os.path.join(BASE_DIR, 'static_files')
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [STATIC_DIR, ]
+#STATICFILES_DIRS = [STATIC_DIR, ]
 STATIC_ROOT = Path(BASE_DIR/ 'static')
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
 
