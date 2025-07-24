@@ -9,6 +9,8 @@ from .models import Leader
 from django.contrib import admin
 from django.contrib import admin
 from .models import MediaAlbum, MediaImage
+from django.contrib import admin
+from .models import Notification
 
 # Register your models here.
 admin.site.register(Event)
@@ -41,3 +43,12 @@ class MediaAlbumAdmin(admin.ModelAdmin):
     list_filter = ('is_recent', 'date_taken')
     search_fields = ('title', 'description')
     date_hierarchy = 'date_taken'
+
+
+
+@admin.register(Notification)
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ('user', 'title', 'is_read', 'created_at')
+    list_filter = ('is_read', 'created_at', 'user')
+    search_fields = ('title', 'message', 'user__username')
+    date_hierarchy = 'created_at'    
