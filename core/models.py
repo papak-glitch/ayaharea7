@@ -28,6 +28,9 @@ from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 from django.db.models import Count, Q
+from django.db import models
+from django.contrib.auth.models import User
+from django.utils import timezone
 
 class Event(models.Model):
     title = models.CharField(max_length=200)
@@ -190,5 +193,22 @@ class MediaImage(models.Model):
         ordering = ['order']
     
     def __str__(self):
-        return f"Image {self.id} for {self.album.title}"        
+        return f"Image {self.id} for {self.album.title}" 
+
+
+
+class Notification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.CharField(max_length=100)
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(default=timezone.now)
+    link = models.URLField(blank=True, null=True)
+    notification_type = models.CharField(max_length=50, blank=True, null=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.title} - {self.user.username}"           
   

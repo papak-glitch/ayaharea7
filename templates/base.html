@@ -1,19 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Area 7 Youth Church{% endblock %}</title>
-    
+
     <!-- Bootstrap CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
     {% load static %}
-    
+
     <style>
         :root {
             --primary-green: #28a745;
@@ -21,36 +23,36 @@
             --dark-green: #155724;
             --accent-green: #20c997;
         }
-        
+
         body {
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
             min-height: 100vh;
             overflow-x: hidden;
         }
-        
+
         .sidebar {
             background: var(--primary-green);
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s ease, width 0.3s ease;
             z-index: 1050;
         }
-        
+
         /* Mobile-first approach - sidebar hidden by default on mobile */
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
                 width: 250px !important;
             }
-            
+
             .sidebar.show {
                 transform: translateX(0);
             }
-            
+
             .main-content-mobile {
                 margin-left: 0 !important;
             }
-            
+
             .toggle-btn-mobile {
                 position: fixed;
                 top: 20px;
@@ -62,100 +64,100 @@
                 width: 50px;
                 height: 50px;
                 border-radius: 50%;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             }
-            
+
             .toggle-btn-mobile:hover {
                 background: var(--accent-green);
                 color: white;
             }
-            
+
             .overlay {
                 position: fixed;
                 top: 0;
                 left: 0;
                 width: 100%;
                 height: 100%;
-                background: rgba(0,0,0,0.5);
+                background: rgba(0, 0, 0, 0.5);
                 z-index: 1040;
                 opacity: 0;
                 visibility: hidden;
                 transition: opacity 0.3s ease, visibility 0.3s ease;
             }
-            
+
             .overlay.show {
                 opacity: 1;
                 visibility: visible;
             }
         }
-        
+
         /* Desktop styles */
         @media (min-width: 769px) {
             .toggle-btn-mobile {
                 display: none;
             }
-            
+
             .overlay {
                 display: none;
             }
         }
-        
+
         .nav-link {
             color: white !important;
             border-radius: 8px;
             margin: 2px 8px;
             transition: all 0.3s ease;
         }
-        
+
         .nav-link:hover {
-            background: rgba(255,255,255,0.2);
+            background: rgba(255, 255, 255, 0.2);
             transform: translateX(5px);
         }
-        
+
         .nav-link.active {
             background: var(--dark-green);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
-        
+
         .toggle-btn {
             background: var(--dark-green);
             border: none;
             color: white;
         }
-        
+
         .toggle-btn:hover {
             background: var(--accent-green);
             color: white;
         }
-        
+
         .main-content {
             min-height: calc(100vh - 60px);
             padding: 20px;
         }
-        
+
         /* Responsive main content margins */
         @media (max-width: 768px) {
             .main-content {
                 padding: 80px 15px 20px 15px;
             }
         }
-        
+
         .footer {
             background: var(--primary-green);
             color: white;
             margin-top: auto;
         }
-        
+
         .footer a {
             color: var(--light-green);
             text-decoration: none;
             transition: color 0.3s ease;
         }
-        
+
         .footer a:hover {
             color: white;
         }
-        
+
         .social-icons a {
             display: inline-block;
             width: 40px;
@@ -167,38 +169,40 @@
             margin: 0 5px;
             transition: all 0.3s ease;
         }
-        
+
         .social-icons a:hover {
             background: var(--accent-green);
             transform: translateY(-3px);
         }
-        
+
         /* Responsive footer */
         @media (max-width: 576px) {
+
             .footer .col-lg-4,
             .footer .col-lg-2 {
                 text-align: center;
                 margin-bottom: 2rem;
             }
-            
+
             .social-icons {
                 justify-content: center;
                 display: flex;
             }
         }
     </style>
-    
+
     {% block extra_css %}{% endblock %}
 </head>
+
 <body>
     <!-- Mobile toggle button -->
     <button class="btn toggle-btn-mobile d-md-none" onclick="toggleMobileSidebar()">
         <i class="fas fa-bars"></i>
     </button>
-    
+
     <!-- Overlay for mobile -->
     <div class="overlay d-md-none" id="overlay" onclick="closeMobileSidebar()"></div>
-    
+
     <div class="d-flex">
         <!-- Sidebar -->
         <nav class="sidebar vh-100 position-fixed" style="width: 80px;" id="sidebar">
@@ -206,58 +210,58 @@
                 <!-- Logo Section -->
                 <div class="text-center mb-3 pb-3 border-bottom border-light border-opacity-25">
                     <a href="{% url 'core:home' %}">
-                        <img src="{% static 'assets/images/arealogo.jpg' %}" alt="Area 7 Youth Logo" 
-                             class="rounded-circle" style="height: 40px; width: 40px; object-fit: cover;" id="logo">
+                        <img src="{% static 'assets/images/arealogo.jpg' %}" alt="Area 7 Youth Logo"
+                            class="rounded-circle" style="height: 40px; width: 40px; object-fit: cover;" id="logo">
                     </a>
                 </div>
-                
+
                 <!-- Toggle Button (Desktop only) -->
                 <div class="text-center mb-3 d-none d-md-block">
-                    <button class="btn toggle-btn btn-sm rounded" onclick="toggleDesktopSidebar()" 
-                            style="width: 40px; height: 40px;">
+                    <button class="btn toggle-btn btn-sm rounded" onclick="toggleDesktopSidebar()"
+                        style="width: 40px; height: 40px;">
                         <i class="fas fa-chevron-right" id="toggleIcon"></i>
                     </button>
                 </div>
-                
+
                 <!-- Navigation Items -->
                 <ul class="nav flex-column flex-grow-1">
                     <li class="nav-item mb-2">
-                        <a class="nav-link d-flex align-items-center px-3 py-3 {% if request.resolver_match.url_name == 'home' %}active{% endif %}" 
-                           href="{% url 'core:home' %}" title="Home">
+                        <a class="nav-link d-flex align-items-center px-3 py-3 {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
+                            href="{% url 'core:home' %}" title="Home">
                             <i class="fas fa-home fs-5"></i>
                             <span class="nav-text ms-3 d-none">Home</span>
                         </a>
                     </li>
                     <li class="nav-item mb-2">
-                        <a class="nav-link d-flex align-items-center px-3 py-3 {% if request.resolver_match.url_name == 'about' %}active{% endif %}" 
-                           href="{% url 'core:about' %}" title="About Us">
+                        <a class="nav-link d-flex align-items-center px-3 py-3 {% if request.resolver_match.url_name == 'about' %}active{% endif %}"
+                            href="{% url 'core:about' %}" title="About Us">
                             <i class="fas fa-info-circle fs-5"></i>
                             <span class="nav-text ms-3 d-none">About</span>
                         </a>
                     </li>
                     <li class="nav-item mb-2">
-                        <a class="nav-link d-flex align-items-center px-3 py-3 {% if request.resolver_match.url_name == 'media_gallery' %}active{% endif %}" 
-                           href="{% url 'core:media_gallery' %}" title="Media">
+                        <a class="nav-link d-flex align-items-center px-3 py-3 {% if request.resolver_match.url_name == 'media_gallery' %}active{% endif %}"
+                            href="{% url 'core:media_gallery' %}" title="Media">
                             <i class="fas fa-photo-video fs-5"></i>
                             <span class="nav-text ms-3 d-none">Media</span>
                         </a>
                     </li>
-                
+
                     <li class="nav-item mb-2">
-                        <a class="nav-link d-flex align-items-center px-3 py-3 {% if request.resolver_match.url_name == 'contact' %}active{% endif %}" 
-                           href="{% url 'core:contact' %}" title="Contact Us">
+                        <a class="nav-link d-flex align-items-center px-3 py-3 {% if request.resolver_match.url_name == 'contact' %}active{% endif %}"
+                            href="{% url 'core:contact' %}" title="Contact Us">
                             <i class="fas fa-envelope fs-5"></i>
                             <span class="nav-text ms-3 d-none">Contact</span>
                         </a>
                     </li>
                 </ul>
-                
+
                 <!-- Bottom Navigation -->
                 <div class="mt-auto">
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link d-flex align-items-center px-3 py-3" 
-                               href="#" title="Prayer Requests">
+                            <a class="nav-link d-flex align-items-center px-3 py-3" href="{% url 'core:contact' %}"
+                                title="Prayer Requests">
                                 <i class="fas fa-pray fs-5"></i>
                                 <span class="nav-text ms-3 d-none">Prayer</span>
                             </a>
@@ -266,7 +270,7 @@
                 </div>
             </div>
         </nav>
-        
+
         <!-- Main Content Area -->
         <div class="flex-grow-1 d-flex flex-column main-content-mobile" id="mainContent" style="margin-left: 80px;">
             <main class="main-content flex-grow-1">
@@ -278,7 +282,7 @@
                 </div>
                 {% endblock %}
             </main>
-            
+
             <!-- Footer -->
             <footer class="footer py-5">
                 <div class="container">
@@ -286,12 +290,12 @@
                         <!-- Church Info -->
                         <div class="col-lg-4 col-md-6 mb-4">
                             <div class="d-flex align-items-center mb-3 justify-content-center justify-content-md-start">
-                                <img src="{% static 'assets/images/arealogo.jpg' %}" alt="Area 7 Youth Logo" 
-                                     class="rounded-circle me-3" style="height: 50px; width: 50px; object-fit: cover;">
+                                <img src="{% static 'assets/images/arealogo.jpg' %}" alt="Area 7 Youth Logo"
+                                    class="rounded-circle me-3" style="height: 50px; width: 50px; object-fit: cover;">
                                 <h5 class="mb-0 fw-bold">Area 7 Youth Church</h5>
                             </div>
                             <p class="text-light mb-3">
-                                Empowering young hearts to serve God and make a difference in our community. 
+                                Empowering young hearts to serve God and make a difference in our community.
                                 Join us in our journey of faith, fellowship, and growth.
                             </p>
                             <div class="social-icons">
@@ -302,7 +306,7 @@
                                 <a href="#" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
                             </div>
                         </div>
-                        
+
                         <!-- Quick Links -->
                         <div class="col-lg-2 col-md-6 mb-4">
                             <h6 class="fw-bold mb-3">Quick Links</h6>
@@ -313,7 +317,7 @@
                                 <li class="mb-2"><a href="{% url 'core:contact' %}">Contact</a></li>
                             </ul>
                         </div>
-                        
+
                         <!-- Services -->
                         <div class="col-lg-2 col-md-6 mb-4">
                             <h6 class="fw-bold mb-3">Ministries</h6>
@@ -324,7 +328,7 @@
                                 <li class="mb-2"><a href="#">Worship Team</a></li>
                             </ul>
                         </div>
-                        
+
                         <!-- Contact Info -->
                         <div class="col-lg-4 col-md-6 mb-4">
                             <h6 class="fw-bold mb-3">Get In Touch</h6>
@@ -346,12 +350,12 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Copyright -->
                     <hr class="border-light border-opacity-25 my-4">
                     <div class="row align-items-center">
                         <div class="col-md-6 text-center text-md-start">
-                            <p class="mb-0">&copy; Product by Papakel, Area7EC {% now "Y" %}   .</p>
+                            <p class="mb-0">&copy; Product by Papakel, Area7EC {% now "Y" %} .</p>
                         </div>
                         <div class="col-md-6 text-center text-md-end">
                         </div>
@@ -360,10 +364,10 @@
             </footer>
         </div>
     </div>
-    
+
     <!-- Bootstrap JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
-    
+
     <!-- Sidebar Toggle Scripts -->
     <script>
         // Desktop sidebar toggle
@@ -373,7 +377,7 @@
             const navTexts = document.querySelectorAll('.nav-text');
             const toggleIcon = document.getElementById('toggleIcon');
             const logo = document.getElementById('logo');
-            
+
             if (sidebar.style.width === '80px' || sidebar.style.width === '') {
                 // Expand sidebar
                 sidebar.style.width = '250px';
@@ -394,47 +398,47 @@
                 logo.style.width = '40px';
             }
         }
-        
+
         // Mobile sidebar toggle
         function toggleMobileSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('overlay');
             const navTexts = document.querySelectorAll('.nav-text');
-            
+
             sidebar.classList.add('show');
             overlay.classList.add('show');
             navTexts.forEach(text => text.classList.remove('d-none'));
-            
+
             // Prevent body scrolling when sidebar is open
             document.body.style.overflow = 'hidden';
         }
-        
+
         // Close mobile sidebar
         function closeMobileSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('overlay');
             const navTexts = document.querySelectorAll('.nav-text');
-            
+
             sidebar.classList.remove('show');
             overlay.classList.remove('show');
             navTexts.forEach(text => text.classList.add('d-none'));
-            
+
             // Restore body scrolling
             document.body.style.overflow = '';
         }
-        
+
         // Handle window resize
         function handleResize() {
             const sidebar = document.getElementById('sidebar');
             const mainContent = document.getElementById('mainContent');
             const navTexts = document.querySelectorAll('.nav-text');
-            
+
             if (window.innerWidth > 768) {
                 // Desktop view - reset mobile styles
                 sidebar.classList.remove('show');
                 document.getElementById('overlay').classList.remove('show');
                 document.body.style.overflow = '';
-                
+
                 // Reset to collapsed state on desktop
                 sidebar.style.width = '80px';
                 mainContent.style.marginLeft = '80px';
@@ -448,27 +452,27 @@
                 navTexts.forEach(text => text.classList.add('d-none'));
             }
         }
-        
+
         // Add event listeners
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Add smooth transitions
             const sidebar = document.getElementById('sidebar');
             const mainContent = document.getElementById('mainContent');
             const toggleIcon = document.getElementById('toggleIcon');
             const logo = document.getElementById('logo');
-            
+
             if (toggleIcon) toggleIcon.style.transition = 'transform 0.3s ease';
             if (logo) logo.style.transition = 'height 0.3s ease, width 0.3s ease';
-            
+
             // Set initial state based on screen size
             handleResize();
-            
+
             // Listen for window resize
             window.addEventListener('resize', handleResize);
-            
+
             // Close mobile sidebar when clicking on navigation links
             document.querySelectorAll('.nav-link').forEach(link => {
-                link.addEventListener('click', function() {
+                link.addEventListener('click', function () {
                     if (window.innerWidth <= 768) {
                         closeMobileSidebar();
                     }
@@ -476,7 +480,8 @@
             });
         });
     </script>
-    
+
     {% block extra_js %}{% endblock %}
 </body>
+
 </html>

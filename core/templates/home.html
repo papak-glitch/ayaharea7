@@ -43,6 +43,463 @@
         margin-bottom: 0;
     }
 
+    .notification-panel {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        width: 350px;
+        max-height: 80vh;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+        overflow: hidden;
+        transform: translateX(400px);
+        transition: transform 0.3s ease;
+        /* Removed display: none */
+    }
+
+    .notification-panel.show {
+        transform: translateX(0);
+    }
+
+    .notification-header {
+        background: var(--primary-green);
+        color: white;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .notification-content {
+        padding: 0;
+        max-height: 60vh;
+        overflow-y: auto;
+    }
+
+    .notification-item {
+        padding: 15px 20px;
+        border-bottom: 1px solid #f0f0f0;
+        transition: background-color 0.2s;
+    }
+
+    .notification-item:hover {
+        background-color: #f8f9fa;
+    }
+
+    .notification-item:last-child {
+        border-bottom: none;
+    }
+
+    .notification-title {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 5px;
+    }
+
+    .notification-text {
+        font-size: 0.9rem;
+        color: #666;
+        margin-bottom: 5px;
+    }
+
+    .notification-time {
+        font-size: 0.8rem;
+        color: #999;
+    }
+
+    .notification-toggle {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: var(--primary-green);
+        color: white;
+        border: none;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        font-size: 1.2rem;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 1001;
+        transition: all 0.3s ease;
+    }
+
+    .notification-toggle:hover {
+        transform: scale(1.05);
+        background: var(--dark-green);
+    }
+
+    .notification-badge {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        background: #dc3545;
+        color: white;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        font-size: 0.7rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+
+    /* Bible Verse Card Styles */
+    .bible-verse-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 30px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        animation: backgroundCycle 20s infinite alternate;
+        background-size: 200% 200%;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    @keyframes backgroundCycle {
+        0% {
+            background-position: 0% 50%;
+        }
+
+        25% {
+            background-position: 50% 100%;
+        }
+
+        50% {
+            background-position: 100% 50%;
+        }
+
+        75% {
+            background-position: 50% 0%;
+        }
+
+        100% {
+            background-position: 0% 50%;
+        }
+    }
+
+    .verse-header {
+        position: absolute;
+        top: 15px;
+        left: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        opacity: 0.8;
+    }
+
+    .verse-text {
+        font-size: 1.2rem;
+        font-style: italic;
+        margin: 15px 0;
+        line-height: 1.6;
+        position: relative;
+        z-index: 2;
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    .verse-reference {
+        font-weight: 600;
+        opacity: 0.9;
+        position: relative;
+        z-index: 2;
+        font-size: 0.9rem;
+    }
+
+    .verse-refresh {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        border-radius: 50%;
+        width: 35px;
+        height: 35px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        z-index: 3;
+    }
+
+    .verse-refresh:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: rotate(180deg);
+    }
+
+    /* Add these for daily changing backgrounds */
+    .bible-verse-card.day1 {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .bible-verse-card.day2 {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+
+    .bible-verse-card.day3 {
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    }
+
+    .bible-verse-card.day4 {
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    }
+
+    .bible-verse-card.day5 {
+        background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+    }
+
+    .bible-verse-card.day6 {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    .bible-verse-card.day7 {
+        background: linear-gradient(135deg, #5ee7df 0%, #b490ca 100%);
+    }
+
+    /* Quick Stats Dashboard */
+    .stats-dashboard {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-item {
+        text-align: center;
+        padding: 20px;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 12px;
+        transition: transform 0.3s ease;
+    }
+
+    .stat-item:hover {
+        transform: translateY(-3px);
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary-green);
+        margin-bottom: 5px;
+    }
+
+    .stat-label {
+        font-size: 0.9rem;
+        color: #666;
+        font-weight: 500;
+    }
+
+    /* Prayer Request Widget */
+    .prayer-widget {
+        background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    .prayer-title {
+        color: #8b4513;
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+
+    .prayer-form {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    .prayer-input {
+        flex: 1;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 25px;
+        outline: none;
+        background: rgba(255, 255, 255, 0.8);
+    }
+
+    .prayer-btn {
+        background: #8b4513;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .prayer-btn:hover {
+        background: #654321;
+        transform: scale(1.05);
+    }
+
+    /* Live Chat Widget */
+    .chat-widget {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 300px;
+        height: 400px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        z-index: 999;
+        transform: translateY(450px);
+        transition: transform 0.3s ease;
+        overflow: hidden;
+    }
+
+    .chat-widget.show {
+        transform: translateY(0);
+    }
+
+    .chat-header {
+        background: var(--primary-green);
+        color: white;
+        padding: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .chat-body {
+        height: 280px;
+        padding: 15px;
+        overflow-y: auto;
+        background: #f8f9fa;
+    }
+
+    .chat-input-area {
+        padding: 15px;
+        background: white;
+        border-top: 1px solid #e9ecef;
+        display: flex;
+        gap: 10px;
+    }
+
+    .chat-input {
+        flex: 1;
+        border: 1px solid #ddd;
+        padding: 8px 12px;
+        border-radius: 20px;
+        outline: none;
+    }
+
+    .chat-send {
+        background: var(--primary-green);
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 20px;
+        cursor: pointer;
+    }
+
+    .chat-toggle {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: var(--primary-green);
+        color: white;
+        border: none;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        font-size: 1.5rem;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+        transition: all 0.3s ease;
+    }
+
+    .chat-toggle:hover {
+        transform: scale(1.05);
+    }
+
+    .chat-message {
+        margin-bottom: 10px;
+        padding: 8px 12px;
+        border-radius: 12px;
+        max-width: 80%;
+    }
+
+    .chat-message.user {
+        background: var(--primary-green);
+        color: white;
+        margin-left: auto;
+    }
+
+    .chat-message.bot {
+        background: white;
+        color: #333;
+        border: 1px solid #e9ecef;
+    }
+
+    /* Announcement Banner */
+    .announcement-banner {
+        background: linear-gradient(45deg, #ff6b6b, #feca57);
+        color: white;
+        padding: 15px;
+        text-align: center;
+        margin-bottom: 20px;
+        border-radius: 12px;
+        position: relative;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.02);
+        }
+
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    .announcement-close {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.2rem;
+        cursor: pointer;
+    }
+
+    /* Weather Widget */
+    .weather-widget {
+        background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 20px;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .weather-icon {
+        font-size: 2rem;
+        margin-bottom: 10px;
+    }
+
+    .weather-temp {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
     .section-title {
         color: var(--primary-green);
         font-weight: 600;
@@ -269,11 +726,68 @@
         .like-dislike-buttons {
             gap: 10px;
         }
+
+        .notification-panel {
+            width: 90%;
+            right: 5%;
+        }
+
+        .chat-widget {
+            width: 90%;
+            right: 5%;
+        }
+
+        .notification-toggle,
+        .chat-toggle {
+            right: 20px;
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
+<!-- Announcement Banner -->
+<div class="announcement-banner" id="announcementBanner">
+    <button class="announcement-close" onclick="closeAnnouncement()">&times;</button>
+    <strong> ZAYA CONFERENCE 2025 COMING UP</strong>
+</div>
+
+<!-- Notification Button -->
+<button class="notification-toggle" onclick="toggleNotifications()">
+    <i class="fas fa-bell"></i>
+    {% if unread_count > 0 %}
+    <span class="notification-badge">{{ unread_count }}</span>
+    {% endif %}
+</button>
+
+<!-- Notification Panel -->
+<div class="notification-panel" id="notificationPanel">
+    <div class="notification-header">
+        <h6>Notifications</h6>
+        <button onclick="toggleNotifications()" class="close-btn">&times;</button>
+    </div>
+    <div class="notification-content">
+        {% for notification in notifications %}
+        <div class="notification-item {% if not notification.is_read %}unread{% endif %}"
+            onclick="markAsRead('{{ notification.id }}', this)">
+            <div class="notification-title">{{ notification.title }}</div>
+            <div class="notification-message">{{ notification.message }}</div>
+            <div class="notification-time">{{ notification.created_at|timesince }} ago</div>
+            {% if notification.link %}
+            <a href="{{ notification.link }}" class="notification-link"></a>
+            {% endif %}
+        </div>
+        {% empty %}
+        <div class="no-notifications">No notifications yet</div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Chat Toggle Button -->
+<button class="chat-toggle" onclick="toggleChat()" id="chatToggle">
+    <i class="fas fa-comments"></i>
+</button>
+
 <!-- Hero Section -->
 <section class="hero-section">
     <div class="container">
@@ -291,115 +805,427 @@
 </section>
 
 <div class="container py-4">
-    <!-- Upcoming Events Section -->
-    <div class="container my-5">
-        <h2 class="mb-4">Upcoming Events</h2>
-        <div class="row">
-            {% for event in upcoming_events %}
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 shadow-sm" data-event-id="{{ event.pk }}">
-                    {% if event.image %}
-                    <img src="{{ event.image.url }}" class="card-img-top" alt="{{ event.title }}"
-                        style="height: 180px; object-fit: cover;">
-                    {% endif %}
-                    <div class="card-body">
-                        <a href="{% url 'core:event_detail' event.pk %}" class="card-link-wrapper"
-                            style="text-decoration: none; color: inherit;">
+    <div class="row">
+        <!-- Main Content Column -->
+        <div class="col-lg-8">
+            <!-- Daily Bible Verse Card -->
+            <div class="bible-verse-card">
+                <div class="verse-header">Verse of the Day</div>
+                {% if user.is_staff %}
+                <button class="verse-refresh" onclick="refreshVerse()" title="Get new verse">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+                {% endif %}
+                <div class="verse-text" id="verseText">
+                    "For I know the plans I have for you," declares the Lord, "plans to prosper you and not to harm you,
+                    to give you hope and a future."
+                </div>
+                <div class="verse-reference" id="verseReference">Jeremiah 29:11</div>
+            </div>
+
+            <!-- Quick Stats Dashboard -->
+            <div class="stats-dashboard">
+                <h5 class="mb-4 text-center">Youth Community Stats</h5>
+                <div class="row">
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="stat-item">
+                            <div class="stat-number" id="memberCount">247</div>
+                            <div class="stat-label">Active Members</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="stat-item">
+                            <div class="stat-number" id="eventCount">12</div>
+                            <div class="stat-label">This Month</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="stat-item">
+                            <div class="stat-number" id="prayerCount">89</div>
+                            <div class="stat-label">Prayer Requests</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="stat-item">
+                            <div class="stat-number" id="onlineCount">23</div>
+                            <div class="stat-label">Online Now</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upcoming Events Section -->
+            <div class="container my-5">
+                <h2 class="mb-4 section-title" style="color: var(--primary-green);">Upcoming Events</h2>
+                <div class="row">
+                    {% for event in upcoming_events %}
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100 shadow-sm" data-event-id="{{ event.pk }}">
+                            {% if event.image %}
+                            <img src="{{ event.image.url }}" class="card-img-top" alt="{{ event.title }}"
+                                style="height: 180px; object-fit: cover;">
+                            {% endif %}
+                            <div class="card-body">
+                                <a href="{% url 'core:event_detail' event.pk %}" class="card-link-wrapper"
+                                    style="text-decoration: none; color: inherit;">
+                                    <h5 class="card-title">{{ event.title }}</h5>
+                                    <p class="text-muted mb-2">
+                                        <i class="fas fa-calendar-day me-2"></i>{{ event.date }} at {{ event.time}}
+                                    </p>
+                                    <p class="text-muted mb-3">
+                                        <i class="fas fa-map-marker-alt me-2"></i>{{ event.location }}
+                                    </p>
+                                    <p class="card-text">{{ event.description|truncatewords:20 }}</p>
+                                </a>
+                            </div>
+                            <div class="card-footer bg-white p-0">
+                                <div class="p-3">
+                                    <a href="{% url 'core:event_detail' event.pk %}"
+                                        class="btn btn-sm btn-primary-green btn-highlight-box">Details</a>
+                                </div>
+                                <div class="like-dislike-section">
+                                    <div class="like-dislike-buttons">
+                                        <button class="like-btn" onclick="toggleLike('{{ event.pk }}', 'like')">
+                                            <i class="fas fa-thumbs-up"></i>
+                                            <span class="like-count" id="like-count-{{ event.pk }}">0</span>
+                                        </button>
+                                        <button class="dislike-btn" onclick="toggleLike('{{ event.pk }}', 'dislike')">
+                                            <i class="fas fa-thumbs-down"></i>
+                                            <span class="dislike-count" id="dislike-count-{{ event.pk }}">0</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-12">
+                        <div class="alert alert-info">No upcoming events scheduled yet.</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end p-2">
+                {% if user.is_staff %}
+                <a href="{% url 'core:event_create' %}" class="btn btn-success btn-sm">
+                    <i class="fas fa-plus-circle me-1"></i> Create Event Here
+                </a>
+                {% endif %}
+            </div>
+
+            <h2 class="mb-4 mt-5 section-title" style="color: var(--primary-green);">Recent Events</h2>
+            <div class="row">
+                {% for event in recent_events %}
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm" data-event-id="{{ event.pk }}">
+                        {% if event.image %}
+                        <img src="{{ event.image.url }}" class="card-img-top" alt="{{ event.title }}"
+                            style="height: 180px; object-fit: cover; filter: grayscale(20%); opacity: 0.9;">
+                        {% endif %}
+                        <div class="card-body">
                             <h5 class="card-title">{{ event.title }}</h5>
                             <p class="text-muted mb-2">
-                                <i class="fas fa-calendar-day me-2"></i>{{ event.date }} at {{ event.time}}
+                                <i class="fas fa-calendar-day me-2"></i>{{ event.date }} at {{ event.time }}
                             </p>
                             <p class="text-muted mb-3">
                                 <i class="fas fa-map-marker-alt me-2"></i>{{ event.location }}
                             </p>
                             <p class="card-text">{{ event.description|truncatewords:20 }}</p>
-                        </a>
-                    </div>
-                    <div class="card-footer bg-white p-0">
-                        <div class="p-3">
-                            <a href="{% url 'core:event_detail' event.pk %}"
-                                class="btn btn-sm btn-primary-green btn-highlight-box">Details</a>
                         </div>
-                        <div class="like-dislike-section">
-                            <div class="like-dislike-buttons">
-                                <button class="like-btn" onclick="toggleLike('{{ event.pk }}', 'like')">
-                                    <i class="fas fa-thumbs-up"></i>
-                                    <span class="like-count" id="like-count-{{ event.pk }}">0</span>
-                                </button>
-                                <button class="dislike-btn" onclick="toggleLike('{{ event.pk }}', 'dislike')">
-                                    <i class="fas fa-thumbs-down"></i>
-                                    <span class="dislike-count" id="dislike-count-{{ event.pk }}">0</span>
-                                </button>
+                        <div class="card-footer bg-white p-0">
+                            <div class="p-3">
+                                <a href="{% url 'core:event_detail' event.pk %}"
+                                    class="btn btn-sm btn-outline-secondary">View
+                                    Recap</a>
+                            </div>
+                            <div class="like-dislike-section">
+                                <div class="like-dislike-buttons">
+                                    <button class="like-btn" onclick="toggleLike('{{ event.pk }}', 'like')">
+                                        <i class="fas fa-thumbs-up"></i>
+                                        <span class="like-count" id="like-count-{{ event.pk }}">0</span>
+                                    </button>
+                                    <button class="dislike-btn" onclick="toggleLike('{{ event.pk }}', 'dislike')">
+                                        <i class="fas fa-thumbs-down"></i>
+                                        <span class="dislike-count" id="dislike-count-{{ event.pk }}">0</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info">No recent events to display.</div>
+                </div>
+                {% endfor %}
             </div>
-            {% empty %}
-            <div class="col-12">
-                <div class="alert alert-info">No upcoming events scheduled yet.</div>
-            </div>
-            {% endfor %}
         </div>
-    </div>
 
-    <div class="d-flex justify-content-end p-2">
-        {% if user.is_staff %}
-        <a href="{% url 'core:event_create' %}" class="btn btn-success btn-sm">
-            <i class="fas fa-plus-circle me-1"></i> Create Event Here
-        </a>
-        {% endif %}
-    </div>
+        <!-- Sidebar Column -->
+        <div class="col-lg-4">
+            <!-- Memory Verse Challenge -->
+            <div class="card mb-4" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
+                <div class="card-body text-center">
+                    <h6 class="mb-3" style="color: #2d3436;"><i class="fas fa-trophy"></i> Memory Verse Challenge</h6>
+                    <p style="color: #636e72; font-size: 0.9rem;">This week's verse:</p>
+                    <div
+                        style="background: rgba(255,255,255,0.7); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                        <em style="color: #2d3436;">"Trust in the Lord with all your heart"</em><br>
+                        <strong style="color: #2d3436;">Proverbs 3:5</strong>
+                    </div>
+                    <button class="btn btn-sm" style="background: #fd79a8; color: white; border: none;"
+                        onclick="takeVerseChallenge()">
+                        <i class="fas fa-play"></i> Take Challenge
+                    </button>
+                    <div class="mt-2">
+                        <small style="color: #636e72;">
+                            <i class="fas fa-users"></i> 45 members participating
+                        </small>
+                    </div>
+                </div>
+            </div>
 
-    <h2 class="mb-4 mt-5">Recent Events</h2>
-    <div class="row">
-        {% for event in recent_events %}
-        <div class="col-md-4 mb-4">
-            <div class="card h-100 shadow-sm" data-event-id="{{ event.pk }}">
-                {% if event.image %}
-                <img src="{{ event.image.url }}" class="card-img-top" alt="{{ event.title }}"
-                    style="height: 180px; object-fit: cover; filter: grayscale(20%); opacity: 0.9;">
-                {% endif %}
+            <!-- Quick Links -->
+            <div class="card">
+                <div class="card-header" style="background: var(--primary-green); color: white;">
+                    <h6 class="mb-0"><i class="fas fa-link"></i> Quick Links</h6>
+                </div>
                 <div class="card-body">
-                    <h5 class="card-title">{{ event.title }}</h5>
-                    <p class="text-muted mb-2">
-                        <i class="fas fa-calendar-day me-2"></i>{{ event.date }} at {{ event.time|time:"g:i A" }}
-                    </p>
-                    <p class="text-muted mb-3">
-                        <i class="fas fa-map-marker-alt me-2"></i>{{ event.location }}
-                    </p>
-                    <p class="card-text">{{ event.description|truncatewords:20 }}</p>
-                </div>
-                <div class="card-footer bg-white p-0">
-                    <div class="p-3">
-                        <a href="{% url 'core:event_detail' event.pk %}" class="btn btn-sm btn-outline-secondary">View
-                            Recap</a>
-                    </div>
-                    <div class="like-dislike-section">
-                        <div class="like-dislike-buttons">
-                            <button class="like-btn" onclick="toggleLike('{{ event.pk }}', 'like')">
-                                <i class="fas fa-thumbs-up"></i>
-                                <span class="like-count" id="like-count-{{ event.pk }}">0</span>
-                            </button>
-                            <button class="dislike-btn" onclick="toggleLike('{{ event.pk }}', 'dislike')">
-                                <i class="fas fa-thumbs-down"></i>
-                                <span class="dislike-count" id="dislike-count-{{ event.pk }}">0</span>
-                            </button>
-                        </div>
-                    </div>
+                    <a href="#" class="d-block mb-2 text-decoration-none">
+                        <i class="fas fa-bible"></i> Daily Devotions
+                    </a>
+                    <a href="#" class="d-block mb-2 text-decoration-none">
+                        <i class="fas fa-music"></i> Worship Songs
+                    </a>
+                    <a href="{% url 'core:contact' %}" class="d-block mb-0 text-decoration-none">
+                        <i class="fas fa-question-circle"></i> Need Help?
+                    </a>
                 </div>
             </div>
         </div>
-        {% empty %}
-        <div class="col-12">
-            <div class="alert alert-info">No recent events to display.</div>
-        </div>
-        {% endfor %}
     </div>
 </div>
 
 <script>
-    // Get device ID for tracking user's personal likes/dislikes
+    // Set daily background based on day of week
+    function setDailyBackground() {
+        const days = ['day1', 'day2', 'day3', 'day4', 'day5', 'day6', 'day7'];
+        const today = new Date().getDay(); // 0-6
+        const card = document.querySelector('.bible-verse-card');
+
+        // Remove all day classes
+        card.classList.remove(...days);
+        // Add today's class
+        card.classList.add(days[today]);
+    }
+
+    // Call this when page loads
+    document.addEventListener('DOMContentLoaded', function () {
+        setDailyBackground();
+    });
+
+    // Sample Bible verses
+    const bibleVerses = [
+        {
+            text: "For I know the plans I have for you, declares the Lord, plans to prosper you and not to harm you, to give you hope and a future.",
+            reference: "Jeremiah 29:11"
+        },
+        {
+            text: "Trust in the Lord with all your heart and lean not on your own understanding.",
+            reference: "Proverbs 3:5"
+        },
+        {
+            text: "I can do all things through Christ who strengthens me.",
+            reference: "Philippians 4:13"
+        },
+        {
+            text: "Be strong and courageous. Do not be afraid; do not be discouraged, for the Lord your God will be with you wherever you go.",
+            reference: "Joshua 1:9"
+        },
+        {
+            text: "And we know that in all things God works for the good of those who love him, who have been called according to his purpose.",
+            reference: "Romans 8:28"
+        },
+        {
+            text: "The Lord is my shepherd, I lack nothing.",
+            reference: "Psalm 23:1"
+        },
+        {
+            text: "Cast all your anxiety on him because he cares for you.",
+            reference: "1 Peter 5:7"
+        },
+        {
+            text: "But seek first his kingdom and his righteousness, and all these things will be given to you as well.",
+            reference: "Matthew 6:33"
+        }
+    ];
+
+    // Replace your current toggleNotifications() function with this:
+    function toggleNotifications() {
+        const panel = document.getElementById('notificationPanel');
+        const badge = document.querySelector('.notification-badge');
+
+        if (panel) {
+            panel.classList.toggle('show');
+
+            // Only remove badge when opening the panel
+            if (panel.classList.contains('show') && badge) {
+                badge.remove();
+
+                // Optional: Send request to mark all as read
+                fetch('/notifications/mark_all_read/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/json'
+                    }
+                }).catch(error => console.error('Error:', error));
+            }
+        } else {
+            console.error("Notification panel not found!");
+        }
+    }
+
+    // Update refreshVerse() to also change background
+    function refreshVerse() {
+        // Change background color when manually refreshed
+        const card = document.querySelector('.bible-verse-card');
+        const currentBg = Array.from(card.classList).find(cls => cls.startsWith('day'));
+        if (currentBg) {
+            const bgNum = parseInt(currentBg.replace('day', ''));
+            const nextBg = bgNum % 7 + 1;
+            card.classList.remove(currentBg);
+            card.classList.add(`day${nextBg}`);
+        }
+
+        const randomIndex = Math.floor(Math.random() * bibleVerses.length);
+        const verse = bibleVerses[randomIndex];
+
+        document.getElementById('verseText').textContent = verse.text;
+        document.getElementById('verseReference').textContent = verse.reference;
+
+        // Save new verse
+        localStorage.setItem('dailyVerse', JSON.stringify(verse));
+        localStorage.setItem('dailyVerseDate', new Date().toDateString());
+
+        // Animate refresh button
+        const refreshBtn = document.querySelector('.verse-refresh');
+        refreshBtn.style.transform = 'rotate(360deg)';
+        setTimeout(() => {
+            refreshBtn.style.transform = 'rotate(0deg)';
+        }, 300);
+    }
+
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', function () {
+        initializePage();
+        loadNotifications();
+        setDailyVerse();
+        updateStats();
+
+        // Update stats every 30 seconds
+        setInterval(updateStats, 30000);
+
+        // Update notifications every 2 minutes
+        setInterval(loadNotifications, 120000);
+    });
+
+    function initializePage() {
+        // Check if announcement should be shown
+        if (localStorage.getItem('announcementClosed') === 'true') {
+            document.getElementById('announcementBanner').style.display = 'none';
+        }
+
+        // Set up existing event functionality
+        const eventCards = document.querySelectorAll('[data-event-id]');
+        eventCards.forEach(card => {
+            const eventId = card.getAttribute('data-event-id');
+            updateButtonStates(eventId);
+            fetchCounts(eventId).then(({ likes, dislikes }) => {
+                updateCountDisplays(eventId, likes, dislikes);
+            });
+        });
+    }
+
+    // Bible verse functions
+    function setDailyVerse() {
+        const today = new Date().toDateString();
+        let savedVerse = localStorage.getItem('dailyVerse');
+        let savedDate = localStorage.getItem('dailyVerseDate');
+
+        if (savedDate !== today || !savedVerse) {
+            // Get a random verse
+            const randomIndex = Math.floor(Math.random() * bibleVerses.length);
+            savedVerse = JSON.stringify(bibleVerses[randomIndex]);
+            localStorage.setItem('dailyVerse', savedVerse);
+            localStorage.setItem('dailyVerseDate', today);
+        }
+
+        const verse = JSON.parse(savedVerse);
+        document.getElementById('verseText').textContent = verse.text;
+        document.getElementById('verseReference').textContent = verse.reference;
+    }
+
+    function closeAnnouncement() {
+        document.getElementById('announcementBanner').style.display = 'none';
+        localStorage.setItem('announcementClosed', 'true');
+    }
+
+    // Stats functions
+    function updateStats() {
+        // Simulate real-time stats updates
+        const memberCount = document.getElementById('memberCount');
+        const onlineCount = document.getElementById('onlineCount');
+
+        // Random small variations
+        const currentMembers = parseInt(memberCount.textContent);
+        const currentOnline = parseInt(onlineCount.textContent);
+
+        // Simulate small changes
+        if (Math.random() > 0.7) {
+            memberCount.textContent = currentMembers + (Math.random() > 0.5 ? 1 : -1);
+        }
+
+        if (Math.random() > 0.5) {
+            const change = Math.floor(Math.random() * 6) - 3; // -3 to +3
+            const newOnline = Math.max(15, Math.min(35, currentOnline + change));
+            onlineCount.textContent = newOnline;
+        }
+    }
+
+    // Memory verse challenge
+    function takeVerseChallenge() {
+        showToast('Memory verse challenge started! Check your progress in the challenges section.');
+    }
+
+    // Utility functions
+    function showToast(message) {
+        // Create toast notification
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary-green);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 25px;
+            z-index: 9999;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        `;
+        toast.textContent = message;
+
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
+    }
+
+    // Existing event functionality (preserved from original code)
     function getDeviceId() {
         let deviceId = localStorage.getItem('device_id');
         if (!deviceId) {
@@ -409,7 +1235,6 @@
         return deviceId;
     }
 
-    // Get user's personal reaction from localStorage
     function getUserReaction(eventId) {
         const deviceId = getDeviceId();
         const liked = localStorage.getItem(`event_${eventId}_liked_${deviceId}`) === 'true';
@@ -417,13 +1242,11 @@
         return { liked, disliked };
     }
 
-    // Set user's personal reaction in localStorage
     function setUserReaction(eventId, type, value) {
         const deviceId = getDeviceId();
         localStorage.setItem(`event_${eventId}_${type}_${deviceId}`, value.toString());
     }
 
-    // Update button visual states based on user's reactions
     function updateButtonStates(eventId) {
         const { liked, disliked } = getUserReaction(eventId);
         const likeBtn = document.querySelector(`[data-event-id="${eventId}"] .like-btn`);
@@ -437,7 +1260,6 @@
         }
     }
 
-    // Fetch counts from server
     async function fetchCounts(eventId) {
         try {
             const response = await fetch(`/api/event/${eventId}/likes/`);
@@ -451,7 +1273,6 @@
         return { likes: 0, dislikes: 0 };
     }
 
-    // Update count displays
     function updateCountDisplays(eventId, likes, dislikes) {
         const likeCountEl = document.getElementById(`like-count-${eventId}`);
         const dislikeCountEl = document.getElementById(`dislike-count-${eventId}`);
@@ -460,7 +1281,6 @@
         if (dislikeCountEl) dislikeCountEl.textContent = dislikes;
     }
 
-    // Send like/dislike to server
     async function sendToServer(eventId, action, isAdding) {
         try {
             const response = await fetch(`/api/event/${eventId}/like/`, {
@@ -487,7 +1307,6 @@
         return false;
     }
 
-    // Get CSRF token
     function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {
@@ -503,22 +1322,18 @@
         return cookieValue;
     }
 
-    // Main toggle function
     async function toggleLike(eventId, action) {
         const { liked, disliked } = getUserReaction(eventId);
         let isAdding = false;
 
         if (action === 'like') {
             if (liked) {
-                // Unlike
                 setUserReaction(eventId, 'liked', false);
                 isAdding = false;
             } else {
-                // Like
                 setUserReaction(eventId, 'liked', true);
                 isAdding = true;
 
-                // Remove dislike if exists
                 if (disliked) {
                     setUserReaction(eventId, 'disliked', false);
                     await sendToServer(eventId, 'dislike', false);
@@ -526,15 +1341,12 @@
             }
         } else if (action === 'dislike') {
             if (disliked) {
-                // Remove dislike
                 setUserReaction(eventId, 'disliked', false);
                 isAdding = false;
             } else {
-                // Dislike
                 setUserReaction(eventId, 'disliked', true);
                 isAdding = true;
 
-                // Remove like if exists
                 if (liked) {
                     setUserReaction(eventId, 'liked', false);
                     await sendToServer(eventId, 'like', false);
@@ -542,28 +1354,8 @@
             }
         }
 
-        // Update button states immediately
         updateButtonStates(eventId);
-
-        // Send to server
         await sendToServer(eventId, action, isAdding);
     }
-
-    // Initialize on page load
-    document.addEventListener('DOMContentLoaded', async function () {
-        // Get all event cards
-        const eventCards = document.querySelectorAll('[data-event-id]');
-
-        for (const card of eventCards) {
-            const eventId = card.getAttribute('data-event-id');
-
-            // Update button states based on user's local preferences
-            updateButtonStates(eventId);
-
-            // Fetch and display current counts from server
-            const { likes, dislikes } = await fetchCounts(eventId);
-            updateCountDisplays(eventId, likes, dislikes);
-        }
-    });
 </script>
 {% endblock %}

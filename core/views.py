@@ -18,23 +18,42 @@ import io
 from django.core.exceptions import PermissionDenied
 
 
+
 # Create your views here.
+from django.shortcuts import render
+from django.utils import timezone
+from .models import Event, Notification
+
 def home(request):
     today = timezone.now().date()
     
-    # Use date__gte for upcoming events (date greater than or equal to today)
+    # Event queries
     upcoming_events = Event.objects.filter(date__gte=today).order_by('date', 'time')
-    
-    # Use date__lt for recent events (date less than today)
     recent_events = Event.objects.filter(date__lt=today).order_by('-date', '-time')
+    
+    # Notification queries (only for authenticated users)
+    if request.user.is_authenticated:
+        notifications = Notification.objects.filter(user=request.user).order_by('-created_at')[:10]
+        unread_count = Notification.objects.filter(user=request.user, is_read=False).count()
+    else:
+        notifications = []
+        unread_count = 0
     
     context = {
         'upcoming_events': upcoming_events,
-        'recent_events': recent_events
+        'recent_events': recent_events,
+        'notifications': notifications,
+        'unread_count': unread_count,
+        'today': today  # Optional: pass today's date to template
     }
-    template_name = 'home.html'
-    print(upcoming_events)
-    return render(request, template_name, context=context)
+    
+    return render(request, 'home.html', context=context)
+
+def mark_as_read(request, notification_id):
+    notification = Notification.objects.get(id=notification_id, user=request.user)
+    notification.is_read = True
+    notification.save()
+    return JsonResponse({'status': 'success'})
 
 def about(request):
     template_name = 'about.html'
@@ -399,3 +418,4 @@ def event_likes_count(request, event_id):
         
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+    
