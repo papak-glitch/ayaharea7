@@ -14,8 +14,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
 
-    {% load static %}
 
+    {% load static %}
+    <link rel="icon" type="image/png" href="{% static  'images/favicon-96x96.png' %}" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="{% static 'images/favicon.svg' %}" />
+    <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}" />
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/apple-touch-icon.png' %}" />
+    <link rel="manifest" href="{% static 'images/site.webmanifest' %}" />
     <style>
         :root {
             --primary-green: #28a745;
