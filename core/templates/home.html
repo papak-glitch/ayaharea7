@@ -5,16 +5,8 @@
 
 {% block extra_css %}
 <style>
-    .hero-section {
-        background: linear-gradient(135deg, var(--primary-green) 0%, var(--accent-green) 100%);
-        color: white;
-        padding: 60px 0;
-        margin-bottom: 40px;
-        position: relative;
-        overflow: hidden;
-    }
-
     .hero-section::before {
+        margin-top: 120px;
         content: '';
         position: absolute;
         top: 0;
@@ -65,7 +57,7 @@
 
     .notification-header {
         background: var(--primary-green);
-        color: white;
+        color: rgb(176, 50, 50);
         padding: 15px 20px;
         display: flex;
         justify-content: space-between;
@@ -341,21 +333,7 @@
         transform: scale(1.05);
     }
 
-    /* Live Chat Widget */
-    .chat-widget {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        width: 300px;
-        height: 400px;
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-        z-index: 999;
-        transform: translateY(450px);
-        transition: transform 0.3s ease;
-        overflow: hidden;
-    }
+
 
     .chat-widget.show {
         transform: translateY(0);
@@ -479,25 +457,79 @@
         cursor: pointer;
     }
 
-    /* Weather Widget */
-    .weather-widget {
-        background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
-        color: white;
+    /* Verse Modal Bubble */
+    .verse-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .verse-modal.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .modal-content {
+        background-color: white;
+        padding: 2rem;
         border-radius: 15px;
-        padding: 20px;
-        text-align: center;
-        margin-bottom: 20px;
+        max-width: 90%;
+        width: 600px;
+        max-height: 80vh;
+        overflow-y: auto;
+        position: relative;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        transform: scale(0.8);
+        transition: transform 0.3s ease;
     }
 
-    .weather-icon {
-        font-size: 2rem;
-        margin-bottom: 10px;
+    .verse-modal.active .modal-content {
+        transform: scale(1);
     }
 
-    .weather-temp {
+    .close-modal {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: none;
+        border: none;
         font-size: 1.5rem;
-        font-weight: bold;
-        margin-bottom: 5px;
+        cursor: pointer;
+        color: #666;
+    }
+
+    .modal-verse-text {
+        font-size: 1.2rem;
+        margin: 1rem 0;
+        line-height: 1.6;
+    }
+
+    .modal-verse-reference {
+        font-style: italic;
+        color: #555;
+        text-align: right;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .modal-content {
+            width: 90%;
+            padding: 1.5rem;
+        }
+
+        .modal-verse-text {
+            font-size: 1rem;
+        }
     }
 
     .section-title {
@@ -746,128 +778,89 @@
 {% endblock %}
 
 {% block content %}
-<!-- Announcement Banner -->
-<div class="announcement-banner" id="announcementBanner">
-    <button class="announcement-close" onclick="closeAnnouncement()">&times;</button>
-    <strong> ZAYA CONFERENCE 2025 COMING UP</strong>
-</div>
 
-<!-- Notification Button -->
-<button class="notification-toggle" onclick="toggleNotifications()">
-    <i class="fas fa-bell"></i>
-    {% if unread_count > 0 %}
-    <span class="notification-badge">{{ unread_count }}</span>
-    {% endif %}
-</button>
-
-<!-- Notification Panel -->
-<div class="notification-panel" id="notificationPanel">
-    <div class="notification-header">
-        <h6>Notifications</h6>
-        <button onclick="toggleNotifications()" class="close-btn">&times;</button>
-    </div>
-    <div class="notification-content">
-        {% for notification in notifications %}
-        <div class="notification-item {% if not notification.is_read %}unread{% endif %}"
-            onclick="markAsRead('{{ notification.id }}', this)">
-            <div class="notification-title">{{ notification.title }}</div>
-            <div class="notification-message">{{ notification.message }}</div>
-            <div class="notification-time">{{ notification.created_at|timesince }} ago</div>
-            {% if notification.link %}
-            <a href="{{ notification.link }}" class="notification-link"></a>
-            {% endif %}
-        </div>
-        {% empty %}
-        <div class="no-notifications">No notifications yet</div>
-        {% endfor %}
-    </div>
-</div>
-
-<!-- Chat Toggle Button -->
-<button class="chat-toggle" onclick="toggleChat()" id="chatToggle">
-    <i class="fas fa-comments"></i>
-</button>
-
-<!-- Hero Section -->
+<!-- Updated Hero Section with Background Image -->
 <section class="hero-section">
     <div class="container">
-        <div class="row justify-content-center text-center">
-            <div class="col-lg-8">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
                 <div class="hero-content">
-                    <img src="{% static 'assets/images/arealogo.jpg' %}" alt="Area 7 Youth Logo"
-                        class="rounded-circle mb-4" style="height: 80px; width: 80px; object-fit: cover;">
-                    <h1 class="hero-title">Welcome to the Area 7 Youth Site</h1>
+                    <h1 class="hero-title">Welcome to the<br>Area 7 Youth Site</h1>
                     <p class="hero-subtitle">Explore the latest events and updates in our faith community</p>
+                    <p class="hero-info">In-person & online: Sunday's at 9 or 10:30AM</p>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
+<style>
+    .hero-section {
+        position: relative;
+
+        background-image: url('{% static "assets/images/logo2.jpg" %}');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        display: flex;
+        align-items: center;
+        color: white;
+    }
+
+    /* Very dark overlay for desktop */
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgb(0, 0, 0);
+        /* 70% darkness - much darker */
+        z-index: 0;
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 1;
+    }
+
+    @media (max-width: 768px) {
+        .hero-section {
+            height: 100vh;
+        }
+
+        /* Even darker for mobile (80% darkness) */
+        .hero-section::before {
+            background-color: rgb(0, 0, 0);
+            /* 80% darkness on mobile */
+        }
+    }
+</style>
+
 <div class="container py-4">
+    <!-- Announcement Banner -->
+    <div class="announcement-banner" id="announcementBanner">
+        <button class="announcement-close" onclick="closeAnnouncement()">&times;</button>
+        <strong> ZAYA CONFERENCE 2025 COMING UP</strong>
+    </div>
+
     <div class="row">
         <!-- Main Content Column -->
-        <div class="col-lg-8">
-            <!-- Daily Bible Verse Card -->
-            <div class="bible-verse-card">
+        <div class="col-lg-8 order-lg-1 order-2">
+            <!-- Bible Verse Card -->
+            <div class="bible-verse-card" onclick="showVerseModal()">
                 <div class="verse-header">Verse of the Day</div>
                 <div class="verse-text" id="verseText"></div>
                 <div class="verse-reference" id="verseReference"></div>
-                <button class="verse-refresh" onclick="refreshVerse()" title="Refresh verse">
+                {% if user.is_authenticated %}
+                <button class="verse-refresh" onclick="refreshVerse(event)" title="Refresh verse">
                     <i class="fas fa-sync-alt"></i>
                 </button>
+                {% endif %}
             </div>
-            <script>
-                // Pick a random verse based on the day, refreshes daily only
-                (function () {
-                    const bibleVerses = [
-                        {
-                            text: "For I know the plans I have for you, declares the Lord, plans to prosper you and not to harm you, to give you hope and a future.",
-                            reference: "Jeremiah 29:11"
-                        },
-                        {
-                            text: "Trust in the Lord with all your heart and lean not on your own understanding.",
-                            reference: "Proverbs 3:5"
-                        },
-                        {
-                            text: "I can do all things through Christ who strengthens me.",
-                            reference: "Philippians 4:13"
-                        },
-                        {
-                            text: "Be strong and courageous. Do not be afraid; do not be discouraged, for the Lord your God will be with you wherever you go.",
-                            reference: "Joshua 1:9"
-                        },
-                        {
-                            text: "And we know that in all things God works for the good of those who love him, who have been called according to his purpose.",
-                            reference: "Romans 8:28"
-                        },
-                        {
-                            text: "The Lord is my shepherd, I lack nothing.",
-                            reference: "Psalm 23:1"
-                        },
-                        {
-                            text: "Cast all your anxiety on him because he cares for you.",
-                            reference: "1 Peter 5:7"
-                        },
-                        {
-                            text: "But seek first his kingdom and his righteousness, and all these things will be given to you as well.",
-                            reference: "Matthew 6:33"
-                        }
-                    ];
-                    // Use the day of year for daily randomization
-                    const now = new Date();
-                    const start = new Date(now.getFullYear(), 0, 0);
-                    const diff = now - start;
-                    const oneDay = 1000 * 60 * 60 * 24;
-                    const dayOfYear = Math.floor(diff / oneDay);
-                    const index = dayOfYear % bibleVerses.length;
-                    document.getElementById('verseText').textContent = bibleVerses[index].text;
-                    document.getElementById('verseReference').textContent = bibleVerses[index].reference;
-                })();
-            </script>
 
-
-            <!-- Quick Stats Dashboard -->
+            <!-- Stats Dashboard -->
             <div class="stats-dashboard">
                 <h5 class="mb-4 text-center">Youth Community Stats</h5>
                 <div class="row">
@@ -898,67 +891,58 @@
                 </div>
             </div>
 
-            <!-- Upcoming Events Section -->
-            <div class="container my-5">
-                <h2 class="mb-4 section-title" style="color: var(--primary-green);">Upcoming Events</h2>
-                <div class="row">
-                    {% for event in upcoming_events %}
-                    <div class="col-md-6 mb-4">
-                        <div class="card h-100 shadow-sm" data-event-id="{{ event.pk }}">
-                            {% if event.image %}
-                            <img src="{{ event.image.url }}" class="card-img-top" alt="{{ event.title }}"
-                                style="height: 180px; object-fit: cover;">
-                            {% endif %}
-                            <div class="card-body">
-                                <a href="{% url 'core:event_detail' event.pk %}" class="card-link-wrapper"
-                                    style="text-decoration: none; color: inherit;">
-                                    <h5 class="card-title">{{ event.title }}</h5>
-                                    <p class="text-muted mb-2">
-                                        <i class="fas fa-calendar-day me-2"></i>{{ event.date }} at {{ event.time}}
-                                    </p>
-                                    <p class="text-muted mb-3">
-                                        <i class="fas fa-map-marker-alt me-2"></i>{{ event.location }}
-                                    </p>
-                                    <p class="card-text">{{ event.description|truncatewords:20 }}</p>
-                                </a>
+            <!-- Upcoming Events -->
+            <h2 class="mb-4 section-title">Upcoming Events</h2>
+            <div class="row">
+                {% for event in upcoming_events %}
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm" data-event-id="{{ event.pk }}">
+                        {% if event.image %}
+                        <img src="{{ event.image.url }}" class="card-img-top" alt="{{ event.title }}"
+                            style="height: 180px; object-fit: cover;">
+                        {% endif %}
+                        <div class="card-body">
+                            <a href="{% url 'core:event_detail' event.pk %}" class="card-link-wrapper"
+                                style="text-decoration: none; color: inherit;">
+                                <h5 class="card-title">{{ event.title }}</h5>
+                                <p class="text-muted mb-2">
+                                    <i class="fas fa-calendar-day me-2"></i>{{ event.date }} at {{ event.time}}
+                                </p>
+                                <p class="text-muted mb-3">
+                                    <i class="fas fa-map-marker-alt me-2"></i>{{ event.location }}
+                                </p>
+                                <p class="card-text">{{ event.description|truncatewords:20 }}</p>
+                            </a>
+                        </div>
+                        <div class="card-footer bg-white p-0">
+                            <div class="p-3">
+                                <a href="{% url 'core:event_detail' event.pk %}"
+                                    class="btn btn-sm btn-primary-green btn-highlight-box">Details</a>
                             </div>
-                            <div class="card-footer bg-white p-0">
-                                <div class="p-3">
-                                    <a href="{% url 'core:event_detail' event.pk %}"
-                                        class="btn btn-sm btn-primary-green btn-highlight-box">Details</a>
-                                </div>
-                                <div class="like-dislike-section">
-                                    <div class="like-dislike-buttons">
-                                        <button class="like-btn" onclick="toggleLike('{{ event.pk }}', 'like')">
-                                            <i class="fas fa-thumbs-up"></i>
-                                            <span class="like-count" id="like-count-{{ event.pk }}">0</span>
-                                        </button>
-                                        <button class="dislike-btn" onclick="toggleLike('{{ event.pk }}', 'dislike')">
-                                            <i class="fas fa-thumbs-down"></i>
-                                            <span class="dislike-count" id="dislike-count-{{ event.pk }}">0</span>
-                                        </button>
-                                    </div>
+                            <div class="like-dislike-section">
+                                <div class="like-dislike-buttons">
+                                    <button class="like-btn" onclick="toggleLike('{{ event.pk }}', 'like')">
+                                        <i class="fas fa-thumbs-up"></i>
+                                        <span class="like-count" id="like-count-{{ event.pk }}">0</span>
+                                    </button>
+                                    <button class="dislike-btn" onclick="toggleLike('{{ event.pk }}', 'dislike')">
+                                        <i class="fas fa-thumbs-down"></i>
+                                        <span class="dislike-count" id="dislike-count-{{ event.pk }}">0</span>
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    {% empty %}
-                    <div class="col-12">
-                        <div class="alert alert-info">No upcoming events scheduled yet.</div>
-                    </div>
-                    {% endfor %}
                 </div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info">No upcoming events scheduled yet.</div>
+                </div>
+                {% endfor %}
             </div>
 
-            <div class="d-flex justify-content-end p-2">
-                {% if user.is_staff %}
-                <a href="{% url 'core:event_create' %}" class="btn btn-success btn-sm">
-                    <i class="fas fa-plus-circle me-1"></i> Create Event Here
-                </a>
-                {% endif %}
-            </div>
-
-            <h2 class="mb-4 mt-5 section-title" style="color: var(--primary-green);">Recent Events</h2>
+            <!-- Recent Events -->
+            <h2 class="mb-4 mt-5 section-title">Recent Events</h2>
             <div class="row">
                 {% for event in recent_events %}
                 <div class="col-md-6 mb-4">
@@ -980,8 +964,7 @@
                         <div class="card-footer bg-white p-0">
                             <div class="p-3">
                                 <a href="{% url 'core:event_detail' event.pk %}"
-                                    class="btn btn-sm btn-outline-secondary">View
-                                    Recap</a>
+                                    class="btn btn-sm btn-outline-secondary">View Recap</a>
                             </div>
                             <div class="like-dislike-section">
                                 <div class="like-dislike-buttons">
@@ -1004,19 +987,28 @@
                 </div>
                 {% endfor %}
             </div>
+
+            <!-- Create Event Button (for staff) -->
+            {% if user.is_staff %}
+            <div class="d-flex justify-content-end p-2">
+                <a href="{% url 'core:event_create' %}" class="btn btn-success btn-sm">
+                    <i class="fas fa-plus-circle me-1"></i> Create Event Here
+                </a>
+            </div>
+            {% endif %}
         </div>
 
         <!-- Sidebar Column -->
-        <div class="col-lg-4">
+        <div class="col-lg-4 order-lg-2 order-1 mb-4">
             <!-- Memory Verse Challenge -->
             <div class="card mb-4" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
                 <div class="card-body text-center">
                     <h6 class="mb-3" style="color: #2d3436;"><i class="fas fa-trophy"></i> Memory Verse Challenge</h6>
                     <p style="color: #636e72; font-size: 0.9rem;">This week's verse:</p>
-                    <div
+                    <div id="memoryVerseCard"
                         style="background: rgba(255,255,255,0.7); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
-                        <em style="color: #2d3436;">"Trust in the Lord with all your heart"</em><br>
-                        <strong style="color: #2d3436;">Proverbs 3:5</strong>
+                        <em id="memoryVerseText" style="color: #2d3436;"></em><br>
+                        <strong id="memoryVerseRef" style="color: #2d3436;"></strong>
                     </div>
                     <button class="btn btn-sm" style="background: #fd79a8; color: white; border: none;"
                         onclick="takeVerseChallenge()">
@@ -1024,7 +1016,7 @@
                     </button>
                     <div class="mt-2">
                         <small style="color: #636e72;">
-                            <i class="fas fa-users"></i> 45 members participating
+                            <i class="fas fa-users"></i> 47 members participating
                         </small>
                     </div>
                 </div>
@@ -1036,7 +1028,8 @@
                     <h6 class="mb-0"><i class="fas fa-link"></i> Quick Links</h6>
                 </div>
                 <div class="card-body">
-                    <a href="#" class="d-block mb-2 text-decoration-none">
+                    <a href="#daily-verse" class="d-block mb-2 text-decoration-none"
+                        onclick="scrollToVerseSection(event)">
                         <i class="fas fa-bible"></i> Daily Devotions
                     </a>
                     <a href="#" class="d-block mb-2 text-decoration-none">
@@ -1051,7 +1044,119 @@
     </div>
 </div>
 
+<!-- Verse Modal -->
+<div class="verse-modal" id="verseModal">
+    <div class="modal-content">
+        <button class="close-modal" onclick="closeVerseModal()">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="verse-header">Verse of the Day</div>
+        <div class="modal-verse-text" id="modalVerseText"></div>
+        <div class="modal-verse-reference" id="modalVerseReference"></div>
+    </div>
+</div>
+
+<!-- Notification Panel -->
+<div class="notification-panel" id="notificationPanel">
+    <div class="notification-header">
+        <h6 style="margin: 0 auto; text-align: center; flex: 1;">Notifications</h6>
+        <button onclick="toggleNotifications()" class="close-btn">&times;</button>
+    </div>
+    <div class="notification-content">
+        {% for notification in notifications %}
+        <div class="notification-item {% if not notification.is_read %}unread{% endif %}"
+            onclick="markAsRead('{{ notification.id }}', this)">
+            <div class="notification-title">{{ notification.title }}</div>
+            <div class="notification-message">{{ notification.message }}</div>
+            <div class="notification-time">{{ notification.created_at|timesince }} ago</div>
+            {% if notification.link %}
+            <a href="{{ notification.link }}" class="notification-link"></a>
+            {% endif %}
+        </div>
+        {% empty %}
+        <div class="no-notifications">No notifications yet</div>
+        {% endfor %}
+    </div>
+</div>
+
+
+
+<!-- Chat Toggle Button -->
+<button class="chat-toggle" onclick="window.location.href='/contact/';" id="chatToggle">
+    <i class="fas fa-comments"></i>
+</button>
+
 <script>
+    // Initialize Bible Verse - Moved to top of script section
+    function initializeDailyVerse() {
+        try {
+            const bibleVerses = [
+                {
+                    text: "For I know the plans I have for you, declares the Lord, plans to prosper you and not to harm you, to give you hope and a future.",
+                    reference: "Jeremiah 29:11"
+                },
+                {
+                    text: "Trust in the Lord with all your heart and lean not on your own understanding.",
+                    reference: "Proverbs 3:5"
+                },
+                {
+                    text: "I can do all things through Christ who strengthens me.",
+                    reference: "Philippians 4:13"
+                },
+                {
+                    text: "Be strong and courageous. Do not be afraid; do not be discouraged, for the Lord your God will be with you wherever you go.",
+                    reference: "Joshua 1:9"
+                },
+                {
+                    text: "And we know that in all things God works for the good of those who love him, who have been called according to his purpose.",
+                    reference: "Romans 8:28"
+                },
+                {
+                    text: "The Lord is my shepherd, I lack nothing.",
+                    reference: "Psalm 23:1"
+                },
+                {
+                    text: "Cast all your anxiety on him because he cares for you.",
+                    reference: "1 Peter 5:7"
+                },
+                {
+                    text: "But seek first his kingdom and his righteousness, and all these things will be given to you as well.",
+                    reference: "Matthew 6:33"
+                }
+            ];
+
+            // Ensure elements exist
+            const verseTextEl = document.getElementById('verseText');
+            const verseRefEl = document.getElementById('verseReference');
+
+            if (verseTextEl && verseRefEl) {
+                // Use the day of year for daily randomization
+                const now = new Date();
+                const start = new Date(now.getFullYear(), 0, 0);
+                const diff = now - start;
+                const oneDay = 1000 * 60 * 60 * 24;
+                const dayOfYear = Math.floor(diff / oneDay);
+                const index = dayOfYear % bibleVerses.length;
+
+                verseTextEl.textContent = bibleVerses[index].text;
+                verseRefEl.textContent = bibleVerses[index].reference;
+
+                // Also set the modal content in case it's opened
+                document.getElementById('modalVerseText').textContent = bibleVerses[index].text;
+                document.getElementById('modalVerseReference').textContent = bibleVerses[index].reference;
+            } else {
+                console.error("Verse elements not found");
+            }
+        } catch (error) {
+            console.error("Error initializing daily verse:", error);
+        }
+    }
+
+    // Call this immediately
+    initializeDailyVerse();
+
+    // Rest of your existing JavaScript remains exactly the same...
+    // All your other functions stay unchanged
     // Set daily background based on day of week
     function setDailyBackground() {
         const days = ['day1', 'day2', 'day3', 'day4', 'day5', 'day6', 'day7'];
@@ -1130,7 +1235,47 @@
             console.error("Notification panel not found!");
         }
     }
+    // Show modal bubble
+    function showVerseModal() {
+        const modal = document.getElementById('verseModal');
+        const verseText = document.getElementById('verseText').innerHTML;
+        const verseRef = document.getElementById('verseReference').innerHTML;
 
+        // Copy verse to modal
+        document.getElementById('modalVerseText').innerHTML = verseText;
+        document.getElementById('modalVerseReference').innerHTML = verseRef;
+
+        // Show modal
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Prevent scrolling
+    }
+
+    // Close modal
+    function closeVerseModal() {
+        const modal = document.getElementById('verseModal');
+        modal.classList.remove('active');
+        document.body.style.overflow = 'auto'; // Re-enable scrolling
+    }
+
+    // Update refresh function to stop event propagation
+    function refreshVerse(event) {
+        event.stopPropagation();
+        fetchVerseOfTheDay();
+    }
+
+    // Close modal when clicking outside content
+    document.getElementById('verseModal').addEventListener('click', function (e) {
+        if (e.target === this) {
+            closeVerseModal();
+        }
+    });
+
+    // Close with ESC key
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            closeVerseModal();
+        }
+    });
     // Update refreshVerse() to also change background
     function refreshVerse() {
         // Change background color when manually refreshed
@@ -1239,6 +1384,60 @@
     }
 
     // Memory verse challenge
+    // Initialize Memory Verse - Moved to top of script section
+    function initializeMemoryVerse() {
+        try {
+            const memoryVerses = [
+                { text: "Let your light shine before others, that they may see your good deeds and glorify your Father in heaven.", reference: "Matthew 5:16" },
+                { text: "Rejoice always, pray continually, give thanks in all circumstances.", reference: "1 Thessalonians 5:16-18" },
+                { text: "Do not let your hearts be troubled. Trust in God; trust also in me.", reference: "John 14:1" },
+                { text: "The Lord is near to all who call on him, to all who call on him in truth.", reference: "Psalm 145:18" },
+                { text: "Therefore encourage one another and build each other up.", reference: "1 Thessalonians 5:11" },
+                { text: "He gives strength to the weary and increases the power of the weak.", reference: "Isaiah 40:29" },
+                { text: "Let us not become weary in doing good, for at the proper time we will reap a harvest if we do not give up.", reference: "Galatians 6:9" },
+                { text: "The name of the Lord is a fortified tower; the righteous run to it and are safe.", reference: "Proverbs 18:10" },
+                { text: "Above all, love each other deeply, because love covers over a multitude of sins.", reference: "1 Peter 4:8" },
+                { text: "My grace is sufficient for you, for my power is made perfect in weakness.", reference: "2 Corinthians 12:9" },
+                { text: "Be kind and compassionate to one another, forgiving each other, just as in Christ God forgave you.", reference: "Ephesians 4:32" },
+                { text: "The Lord will fight for you; you need only to be still.", reference: "Exodus 14:14" }
+            ];
+
+            // Ensure elements exist
+            const verseTextEl = document.getElementById('memoryVerseText');
+            const verseRefEl = document.getElementById('memoryVerseRef');
+
+            if (verseTextEl && verseRefEl) {
+                // Pick verse based on week number
+                const now = new Date();
+                const start = new Date(now.getFullYear(), 0, 1);
+                const weekNum = Math.floor(((now - start) / (1000 * 60 * 60 * 24) + start.getDay() + 1) / 7);
+                const index = weekNum % memoryVerses.length;
+
+                verseTextEl.textContent = `"${memoryVerses[index].text}"`;
+                verseRefEl.textContent = memoryVerses[index].reference;
+            } else {
+                console.error("Memory verse elements not found");
+            }
+        } catch (error) {
+            console.error("Error initializing memory verse:", error);
+        }
+    }
+
+    // Call this immediately after the element exists
+    function initMemoryVerseWhenReady() {
+        if (document.getElementById('memoryVerseText')) {
+            initializeMemoryVerse();
+        } else {
+            setTimeout(initMemoryVerseWhenReady, 50);
+        }
+    }
+
+    // Start the initialization check
+    initMemoryVerseWhenReady();
+
+    // Rest of your existing JavaScript remains exactly the same...
+    // All your other functions stay unchanged
+    // Memory verse challenge
     function takeVerseChallenge() {
         showToast('Memory verse challenge started! Check your progress in the challenges section.');
     }
@@ -1253,7 +1452,7 @@
             left: 50%;
             transform: translateX(-50%);
             background: var(--primary-green);
-            color: white;
+            color:
             padding: 15px 25px;
             border-radius: 25px;
             z-index: 9999;

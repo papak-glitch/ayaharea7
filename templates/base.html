@@ -22,6 +22,239 @@
     <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/apple-touch-icon.png' %}" />
     <link rel="manifest" href="{% static 'images/site.webmanifest' %}" />
     <style>
+        /* Add these styles to your main CSS file */
+
+        :root {
+            --primary-green: #7CB342;
+            --dark-bg: #1a1a1a;
+            --text-light: #ffffff;
+        }
+
+        /* Navigation Styles */
+        .navbar {
+            background: rgba(26, 26, 26, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-brand img {
+            height: 50px;
+            width: 50px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .navbar-brand img:hover {
+            transform: scale(1.05);
+        }
+
+        .navbar-nav .nav-link {
+            color: var(--text-light) !important;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0 1rem;
+            padding: 0.5rem 1rem !important;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .navbar-nav .nav-link:hover,
+        .navbar-nav .nav-link.active {
+            color: var(--primary-green) !important;
+        }
+
+        .navbar-nav .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: var(--primary-green);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .navbar-nav .nav-link:hover::after,
+        .navbar-nav .nav-link.active::after {
+            width: 80%;
+        }
+
+        .navbar-toggler {
+            border: none;
+            color: var(--text-light);
+            padding: 0.25rem 0.5rem;
+        }
+
+        .navbar-toggler:focus {
+            box-shadow: none;
+        }
+
+        .navbar-toggler i {
+            font-size: 1.2rem;
+        }
+
+        /* Hero Section Styles */
+        .hero-section {
+            height: 100vh;
+            width: 100vw;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.3)),
+                url('https://images.unsplash.com/photo-1507692049790-de58290a4334?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            left: 50%;
+            right: 50%;
+            margin-left: -50vw;
+            margin-right: -50vw;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(124, 179, 66, 0.1), rgba(0, 0, 0, 0.3));
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            max-width: 600px;
+            padding: 2rem 1rem;
+            margin: 0 auto;
+        }
+
+        .hero-content img {
+            height: 120px;
+            width: 120px;
+            object-fit: cover;
+            margin-bottom: 2rem;
+            border: 4px solid var(--primary-green);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .hero-title {
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+            color: var(--text-light);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            font-weight: 300;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 2rem;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+            animation: fadeInUp 1s ease-out 0.4s both;
+        }
+
+        .hero-info {
+            font-size: 1.1rem;
+            color: var(--primary-green);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            animation: fadeInUp 1s ease-out 0.6s both;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Mobile Menu Styles */
+        .navbar-collapse {
+            background: rgba(26, 26, 26, 0.98);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            margin-top: 1rem;
+            padding: 1rem;
+        }
+
+        @media (max-width: 991px) {
+            .navbar-collapse {
+                position: absolute;
+                top: 100%;
+                left: 1rem;
+                right: 1rem;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navbar-nav .nav-link {
+                margin: 0;
+                text-align: center;
+            }
+
+            .hero-section {
+                background-attachment: scroll;
+                width: 100vw;
+                margin-left: -50vw;
+                margin-right: -50vw;
+                left: 50%;
+                right: 50%;
+            }
+
+            .hero-content {
+                padding: 1rem 0.5rem;
+                max-width: 500px;
+            }
+
+            .hero-content img {
+                height: 80px;
+                width: 80px;
+            }
+        }
+
+
+
+        /* Bubble effect for favicon in browser tab */
+        link[rel="icon"],
+        link[rel="apple-touch-icon"] {
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            border: 2px solid white;
+            transition: all 0.3s ease;
+        }
+
+        /* Enhanced for when users hover over tab */
+        link[rel="icon"]:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
         :root {
             --primary-green: #28a745;
             --light-green: #d4edda;
@@ -29,19 +262,8 @@
             --accent-green: #20c997;
         }
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
 
-        .sidebar {
-            background: var(--primary-green);
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease, width 0.3s ease;
-            z-index: 1050;
-        }
+
 
         /* Mobile-first approach - sidebar hidden by default on mobile */
         @media (max-width: 768px) {
@@ -137,15 +359,9 @@
 
         .main-content {
             min-height: calc(100vh - 60px);
-            padding: 20px;
+
         }
 
-        /* Responsive main content margins */
-        @media (max-width: 768px) {
-            .main-content {
-                padding: 80px 15px 20px 15px;
-            }
-        }
 
         .footer {
             background: var(--primary-green);
@@ -200,84 +416,60 @@
 </head>
 
 <body>
-    <!-- Mobile toggle button -->
-    <button class="btn toggle-btn-mobile d-md-none" onclick="toggleMobileSidebar()">
-        <i class="fas fa-bars"></i>
-    </button>
+
 
     <!-- Overlay for mobile -->
     <div class="overlay d-md-none" id="overlay" onclick="closeMobileSidebar()"></div>
 
     <div class="d-flex">
-        <!-- Sidebar -->
-        <nav class="sidebar vh-100 position-fixed" style="width: 80px;" id="sidebar">
-            <div class="d-flex flex-column h-100 py-3">
-                <!-- Logo Section -->
-                <div class="text-center mb-3 pb-3 border-bottom border-light border-opacity-25">
-                    <a href="{% url 'core:home' %}">
-                        <img src="{% static 'assets/images/arealogo.jpg' %}" alt="Area 7 Youth Logo"
-                            class="rounded-circle" style="height: 40px; width: 40px; object-fit: cover;" id="logo">
-                    </a>
-                </div>
+        <!-- Navigation for base.html -->
+        <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+            <div class="container">
+                <a class="navbar-brand" href="{% url 'core:home' %}">
+                    <img src="{% static 'assets/images/arealogo.jpg' %}" alt="Area 7 Youth Logo" class="rounded-circle">
+                </a>
 
-                <!-- Toggle Button (Desktop only) -->
-                <div class="text-center mb-3 d-none d-md-block">
-                    <button class="btn toggle-btn btn-sm rounded" onclick="toggleDesktopSidebar()"
-                        style="width: 40px; height: 40px;">
-                        <i class="fas fa-chevron-right" id="toggleIcon"></i>
-                    </button>
-                </div>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <i class="fas fa-bars"></i>
+                </button>
 
-                <!-- Navigation Items -->
-                <ul class="nav flex-column flex-grow-1">
-                    <li class="nav-item mb-2">
-                        <a class="nav-link d-flex align-items-center px-3 py-3 {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
-                            href="{% url 'core:home' %}" title="Home">
-                            <i class="fas fa-home fs-5"></i>
-                            <span class="nav-text ms-3 d-none">Home</span>
-                        </a>
-                    </li>
-                    <li class="nav-item mb-2">
-                        <a class="nav-link d-flex align-items-center px-3 py-3 {% if request.resolver_match.url_name == 'about' %}active{% endif %}"
-                            href="{% url 'core:about' %}" title="About Us">
-                            <i class="fas fa-info-circle fs-5"></i>
-                            <span class="nav-text ms-3 d-none">About</span>
-                        </a>
-                    </li>
-                    <li class="nav-item mb-2">
-                        <a class="nav-link d-flex align-items-center px-3 py-3 {% if request.resolver_match.url_name == 'media_gallery' %}active{% endif %}"
-                            href="{% url 'core:media_gallery' %}" title="Media">
-                            <i class="fas fa-photo-video fs-5"></i>
-                            <span class="nav-text ms-3 d-none">Media</span>
-                        </a>
-                    </li>
-
-                    <li class="nav-item mb-2">
-                        <a class="nav-link d-flex align-items-center px-3 py-3 {% if request.resolver_match.url_name == 'contact' %}active{% endif %}"
-                            href="{% url 'core:contact' %}" title="Contact Us">
-                            <i class="fas fa-envelope fs-5"></i>
-                            <span class="nav-text ms-3 d-none">Contact</span>
-                        </a>
-                    </li>
-                </ul>
-
-                <!-- Bottom Navigation -->
-                <div class="mt-auto">
-                    <ul class="nav flex-column">
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
                         <li class="nav-item">
-                            <a class="nav-link d-flex align-items-center px-3 py-3" href="{% url 'core:contact' %}"
-                                title="Prayer Requests">
-                                <i class="fas fa-pray fs-5"></i>
-                                <span class="nav-text ms-3 d-none">Prayer</span>
+                            <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
+                                href="{% url 'core:home' %}" title="Home">
+                                <i class="fas fa-home d-lg-none me-2"></i>Home
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}"
+                                href="{% url 'core:about' %}" title="About Us">
+                                <i class="fas fa-info-circle d-lg-none me-2"></i>About
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'media_gallery' %}active{% endif %}"
+                                href="{% url 'core:media_gallery' %}" title="Media">
+                                <i class="fas fa-photo-video d-lg-none me-2"></i>Media
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}"
+                                href="{% url 'core:contact' %}" title="Contact Us">
+                                <i class="fas fa-envelope d-lg-none me-2"></i>Contact
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'core:contact' %}" title="Prayer Requests">
+                                <i class="fas fa-pray d-lg-none me-2"></i>Prayer
                             </a>
                         </li>
                     </ul>
                 </div>
             </div>
         </nav>
-
         <!-- Main Content Area -->
-        <div class="flex-grow-1 d-flex flex-column main-content-mobile" id="mainContent" style="margin-left: 80px;">
+        <div class="flex-grow-1 d-flex flex-column main-content-mobile" id="mainContent" style="">
             <main class="main-content flex-grow-1">
                 {% block content %}
                 <!-- Page content goes here -->
@@ -375,6 +567,48 @@
 
     <!-- Sidebar Toggle Scripts -->
     <script>
+        // Add this JavaScript to your base template or main JS file
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Add smooth scrolling and navbar background change on scroll
+            window.addEventListener('scroll', function () {
+                const navbar = document.querySelector('.navbar');
+                if (navbar) {
+                    if (window.scrollY > 50) {
+                        navbar.style.background = 'rgba(26, 26, 26, 0.98)';
+                    } else {
+                        navbar.style.background = 'rgba(26, 26, 26, 0.95)';
+                    }
+                }
+            });
+
+            // Close mobile menu when clicking on a link
+            document.querySelectorAll('.navbar-nav .nav-link').forEach(link => {
+                link.addEventListener('click', () => {
+                    const navbarCollapse = document.querySelector('.navbar-collapse');
+                    if (navbarCollapse && navbarCollapse.classList.contains('show')) {
+                        const bsCollapse = bootstrap.Collapse.getInstance(navbarCollapse);
+                        if (bsCollapse) {
+                            bsCollapse.hide();
+                        }
+                    }
+                });
+            });
+
+            // Add smooth scrolling for internal links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        });
         // Desktop sidebar toggle
         function toggleDesktopSidebar() {
             const sidebar = document.getElementById('sidebar');
@@ -484,6 +718,31 @@
                 });
             });
         });
+        // Add subtle pulsing animation to favicon
+        function animateFavicon() {
+            const favicon = document.querySelector('link[rel="icon"]');
+            let scale = 1;
+            let growing = true;
+
+            setInterval(() => {
+                scale = growing ? scale + 0.02 : scale - 0.02;
+                if (scale > 1.1) growing = false;
+                if (scale < 0.9) growing = true;
+
+                // Only animate if tab is visible
+                if (!document.hidden) {
+                    favicon.setAttribute('href',
+                        `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="45" fill="%23yourcolor" 
+                        transform="scale(${scale})" transform-origin="50 50"/>
+                    ${/* Your icon SVG code here */''}
+                </svg>`);
+                }
+            }, 100);
+        }
+
+        // Start animation when page loads
+        document.addEventListener('DOMContentLoaded', animateFavicon);
     </script>
 
     {% block extra_js %}{% endblock %}
