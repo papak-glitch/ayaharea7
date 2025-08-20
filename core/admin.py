@@ -52,3 +52,11 @@ class NotificationAdmin(admin.ModelAdmin):
     list_filter = ('is_read', 'created_at', 'user')
     search_fields = ('title', 'message', 'user__username')
     date_hierarchy = 'created_at'    
+
+@admin.register(GalleryImage)
+class GalleryImageAdmin(admin.ModelAdmin):
+    list_display = ['title', 'order', 'created_at']
+    list_editable = ['order']
+    list_filter = ['created_at']
+    search_fields = ['title', 'description']
+

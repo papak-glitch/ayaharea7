@@ -210,5 +210,33 @@ class Notification(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        return f"{self.title} - {self.user.username}"           
+        return f"{self.title} - {self.user.username}"    
+
+
+from django.db import models
+from django.contrib.auth.models import User
+
+class BibleVerse(models.Model):
+    verse_text = models.TextField()
+    reference = models.CharField(max_length=100)
+    date = models.DateField(auto_now_add=True)
+
+class VerseLike(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)  # Allow anonymous
+    verse = models.ForeignKey(BibleVerse, on_delete=models.CASCADE)
+    ip_address = models.CharField(max_length=45, blank=True)  # Track anonymous users
+    created_at = models.DateTimeField(auto_now_add=True)    
+               
   
+class GalleryImage(models.Model):
+    title = models.CharField(max_length=200, blank=True)
+    description = models.TextField(blank=True)
+    image = models.ImageField(upload_to='gallery/')
+    order = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['order', '-created_at']
+    
+    def __str__(self):
+        return self.title or f"Gallery Image {self.id}"

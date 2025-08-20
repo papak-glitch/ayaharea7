@@ -22,19 +22,12 @@
     <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/apple-touch-icon.png' %}" />
     <link rel="manifest" href="{% static 'images/site.webmanifest' %}" />
     <style>
-        /* Add these styles to your main CSS file */
-
-        :root {
-            --primary-green: #7CB342;
-            --dark-bg: #1a1a1a;
-            --text-light: #ffffff;
-        }
-
         /* Navigation Styles */
         .navbar {
             background: rgba(26, 26, 26, 0.95);
             backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             padding: 1rem 0;
             transition: all 0.3s ease;
         }
@@ -57,6 +50,7 @@
             letter-spacing: 0.5px;
             margin: 0 1rem;
             padding: 0.5rem 1rem !important;
+            border-radius: 8px;
             transition: all 0.3s ease;
             position: relative;
         }
@@ -64,6 +58,7 @@
         .navbar-nav .nav-link:hover,
         .navbar-nav .nav-link.active {
             color: var(--primary-green) !important;
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .navbar-nav .nav-link::after {
@@ -84,17 +79,80 @@
         }
 
         .navbar-toggler {
-            border: none;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            padding: 0.5rem;
+            border-radius: 8px;
             color: var(--text-light);
-            padding: 0.25rem 0.5rem;
+            background: transparent;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-toggler:hover {
+            border-color: white;
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .navbar-toggler:focus {
-            box-shadow: none;
+            box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25);
         }
 
         .navbar-toggler i {
             font-size: 1.2rem;
+        }
+
+        /* Mobile Navigation Fixes */
+        @media (max-width: 991.98px) {
+            .navbar-collapse {
+                background: rgba(40, 167, 69, 0.95);
+                backdrop-filter: blur(10px);
+                border-radius: 10px;
+                margin-top: 1rem;
+                padding: 1rem;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            }
+
+            .navbar-nav {
+                align-items: stretch;
+            }
+
+            .nav-item {
+                margin: 0.25rem 0;
+            }
+
+            .navbar-nav .nav-link {
+                margin: 0.25rem 0;
+                padding: 0.75rem 1rem !important;
+                display: flex;
+                align-items: center;
+                background: rgba(255, 255, 255, 0.1);
+            }
+
+            .navbar-nav .nav-link:hover {
+                background: rgba(255, 255, 255, 0.2);
+                transform: translateX(5px);
+            }
+
+            .navbar-nav .nav-link.active {
+                background: rgba(255, 255, 255, 0.3);
+            }
+
+            .navbar-nav .nav-link i {
+                width: 20px;
+                text-align: center;
+            }
+        }
+
+        /* Body padding for fixed navbar */
+        body {
+            padding-top: 60px;
+            /* Adjust based on your navbar height */
+            background: #f8f9fa;
+        }
+
+        :root {
+            --primary-green: #7CB342;
+            --dark-bg: #1a1a1a;
+            --text-light: #ffffff;
         }
 
         /* Hero Section Styles */

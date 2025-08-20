@@ -9,6 +9,7 @@ from django.urls import path
 from . import views
 from django.urls import path
 from .views import media_gallery
+from .views import  like_verse
 app_name = 'core'
 
 urlpatterns = [
@@ -26,6 +27,8 @@ urlpatterns = [
     path('api/event/<int:event_id>/like/', views.event_like, name='event_like'),
     path('api/event/<int:event_id>/likes/', views.event_likes_count, name='event_likes_count'),
     path('notifications/mark_as_read/<int:notification_id>/', views.mark_as_read, name='mark_as_read'),
+    path('like/<int:verse_id>/', like_verse, name='like_verse'),
+    
    
     
 ]

@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import CreateView
-from .models import Event
+from .models import Event, GalleryImage
 from .forms import EventForm
 from django.contrib import messages
 from django.urls import reverse
@@ -30,6 +30,7 @@ def home(request):
     # Event queries
     upcoming_events = Event.objects.filter(date__gte=today).order_by('date', 'time')
     recent_events = Event.objects.filter(date__lt=today).order_by('-date', '-time')
+    gallery_images = GalleryImage.objects.all()[:10]
     
     # Notification queries (only for authenticated users)
     if request.user.is_authenticated:
@@ -42,6 +43,7 @@ def home(request):
     context = {
         'upcoming_events': upcoming_events,
         'recent_events': recent_events,
+        'gallery_images': gallery_images,
         'notifications': notifications,
         'unread_count': unread_count,
         'today': today  # Optional: pass today's date to template
@@ -418,4 +420,27 @@ def event_likes_count(request, event_id):
         
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+    
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
+
+@require_POST
+def like_verse(request, verse_id):
+    verse = BibleVerse.objects.get(id=verse_id)
+    
+    # Track either by user or IP
+    if request.user.is_authenticated:
+        like, created = VerseLike.objects.get_or_create(user=request.user, verse=verse)
+    else:
+        ip = request.META.get('REMOTE_ADDR', '')
+        like, created = VerseLike.objects.get_or_create(ip_address=ip, verse=verse, defaults={'user': None})
+    
+    if not created:
+        like.delete()  # Toggle like
+    
+    return JsonResponse({
+        'total_likes': verse.verselike_set.count(),
+        'user_has_liked': created
+    }) 
     
