@@ -27,8 +27,16 @@ urlpatterns = [
     path('api/event/<int:event_id>/like/', views.event_like, name='event_like'),
     path('api/event/<int:event_id>/likes/', views.event_likes_count, name='event_likes_count'),
     path('notifications/mark_as_read/<int:notification_id>/', views.mark_as_read, name='mark_as_read'),
-    path('like/<int:verse_id>/', like_verse, name='like_verse'),
+     # Like functionality - accessible to everyone
+    path('like/<int:verse_id>/', views.like_verse, name='like_verse'),
+    
+    # Share functionality - accessible to everyone  
+    path('share/<int:verse_id>/', views.share_verse, name='share_verse'),
+    
+    # Get verse statistics - accessible to everyone
+    path('stats/<int:verse_id>/', views.get_verse_stats, name='verse_stats'),
+    
+
+]
     
    
-    
-]
