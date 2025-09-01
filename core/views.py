@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import CreateView
-from .models import Event, GalleryImage
+from .models import AnonymousVerseInteraction, Event, GalleryImage, BibleVerse, VerseLike, VerseShare
 from .forms import EventForm
 from django.contrib import messages
 from django.urls import reverse
@@ -16,12 +16,28 @@ from .models import MediaImage
 import zipfile
 import io
 from django.core.exceptions import PermissionDenied
+from django.shortcuts import render, get_object_or_404
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.db import transaction
+
+def get_client_ip(request):
+    """Utility to get client IP address from request."""
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+
+def get_user_agent(request):
+    """Utility to get user agent string from request."""
+    return request.META.get('HTTP_USER_AGENT', '')
 
 
 
-# Create your views here.
-from django.shortcuts import render
-from django.utils import timezone
+# Create your views here
 from .models import Event, Notification
 
 def home(request):
@@ -50,6 +66,179 @@ def home(request):
     }
     
     return render(request, 'home.html', context=context)
+
+@require_POST
+def like_verse(request, verse_id):
+    """Handle verse like/unlike functionality for ALL users"""
+    verse = get_object_or_404(BibleVerse, id=verse_id)
+    
+    try:
+        with transaction.atomic():
+            ip_address = get_client_ip(request)
+            user_agent = get_user_agent(request)
+            
+            # Ensure session exists
+            if not request.session.session_key:
+                request.session.create()
+            session_key = request.session.session_key
+            
+            user_has_liked = False
+            
+            if request.user.is_authenticated:
+                # For authenticated users
+                like, created = VerseLike.objects.get_or_create(
+                    user=request.user,
+                    verse=verse,
+                    defaults={'ip_address': ip_address}
+                )
+                
+                if not created:
+                    # Unlike - delete the like
+                    like.delete()
+                    user_has_liked = False
+                else:
+                    # New like - also remove any anonymous like from same session
+                    AnonymousVerseInteraction.objects.filter(
+                        verse=verse,
+                        ip_address=ip_address,
+                        session_key=session_key,
+                        interaction_type='like'
+                    ).delete()
+                    user_has_liked = True
+                    
+            else:
+                # For anonymous users
+                existing_like = AnonymousVerseInteraction.objects.filter(
+                    verse=verse,
+                    ip_address=ip_address,
+                    session_key=session_key,
+                    interaction_type='like'
+                ).first()
+                
+                if existing_like:
+                    # Unlike - delete the interaction
+                    existing_like.delete()
+                    user_has_liked = False
+                else:
+                    # New like
+                    AnonymousVerseInteraction.objects.create(
+                        verse=verse,
+                        ip_address=ip_address,
+                        session_key=session_key,
+                        interaction_type='like',
+                        user_agent=user_agent
+                    )
+                    user_has_liked = True
+        
+        # Calculate total likes
+        total_likes = verse.total_likes
+        
+        return JsonResponse({
+            'success': True,
+            'user_has_liked': user_has_liked,
+            'total_likes': total_likes,
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+@require_POST 
+def share_verse(request, verse_id):
+    """Handle verse sharing for ALL users"""
+    verse = get_object_or_404(BibleVerse, id=verse_id)
+    
+    try:
+        data = json.loads(request.body) if request.body else {}
+        share_method = data.get('method', 'clipboard')
+        ip_address = get_client_ip(request)
+        user_agent = get_user_agent(request)
+        
+        # Ensure session exists
+        if not request.session.session_key:
+            request.session.create()
+        session_key = request.session.session_key
+        
+        with transaction.atomic():
+            if request.user.is_authenticated:
+                # For authenticated users
+                VerseShare.objects.create(
+                    user=request.user,
+                    verse=verse,
+                    ip_address=ip_address,
+                    share_method=share_method
+                )
+            else:
+                # For anonymous users - allow multiple shares
+                AnonymousVerseInteraction.objects.create(
+                    verse=verse,
+                    ip_address=ip_address,
+                    session_key=session_key,
+                    interaction_type='share',
+                    user_agent=user_agent
+                )
+        
+        # Calculate total shares
+        total_shares = verse.total_shares
+        
+        return JsonResponse({
+            'success': True,
+            'total_shares': total_shares,
+            'message': 'Verse shared successfully!'
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+def get_verse_stats(request, verse_id):
+    """Get current stats for a verse - available to ALL users"""
+    verse = get_object_or_404(BibleVerse, id=verse_id)
+    
+    # Get totals
+    total_likes = verse.total_likes
+    total_shares = verse.total_shares
+    
+    # Check if current user has liked
+    user_has_liked = False
+    ip_address = get_client_ip(request)
+    
+    # Ensure session exists
+    if not request.session.session_key:
+        request.session.create()
+    session_key = request.session.session_key
+    
+    if request.user.is_authenticated:
+        # Check authenticated user likes first
+        user_has_liked = verse.likes.filter(user=request.user).exists()
+        
+        # If not liked as authenticated user, check if they liked as anonymous
+        if not user_has_liked:
+            user_has_liked = AnonymousVerseInteraction.objects.filter(
+                verse=verse,
+                ip_address=ip_address,
+                session_key=session_key,
+                interaction_type='like'
+            ).exists()
+    else:
+        # Check anonymous interaction
+        user_has_liked = AnonymousVerseInteraction.objects.filter(
+            verse=verse,
+            ip_address=ip_address,
+            session_key=session_key,
+            interaction_type='like'
+        ).exists()
+    
+    return JsonResponse({
+        'total_likes': total_likes,
+        'total_shares': total_shares,
+        'user_has_liked': user_has_liked,
+    })
+
 
 def mark_as_read(request, notification_id):
     notification = Notification.objects.get(id=notification_id, user=request.user)

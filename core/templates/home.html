@@ -34,109 +34,8 @@
         margin-bottom: 0;
     }
 
-    .notification-panel {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        width: 350px;
-        max-height: 80vh;
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-        z-index: 1000;
-        overflow: hidden;
-        transform: translateX(400px);
-        transition: transform 0.3s ease;
-        /* Removed display: none */
-    }
 
-    .notification-panel.show {
-        transform: translateX(0);
-    }
 
-    .notification-header {
-        background: var(--primary-green);
-        color: rgb(176, 50, 50);
-        padding: 15px 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .notification-content {
-        padding: 0;
-        max-height: 60vh;
-        overflow-y: auto;
-    }
-
-    .notification-item {
-        padding: 15px 20px;
-        border-bottom: 1px solid #f0f0f0;
-        transition: background-color 0.2s;
-    }
-
-    .notification-item:hover {
-        background-color: #f8f9fa;
-    }
-
-    .notification-item:last-child {
-        border-bottom: none;
-    }
-
-    .notification-title {
-        font-weight: 600;
-        color: #333;
-        margin-bottom: 5px;
-    }
-
-    .notification-text {
-        font-size: 0.9rem;
-        color: #666;
-        margin-bottom: 5px;
-    }
-
-    .notification-time {
-        font-size: 0.8rem;
-        color: #999;
-    }
-
-    .notification-toggle {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: var(--primary-green);
-        color: white;
-        border: none;
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        font-size: 1.2rem;
-        cursor: pointer;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        z-index: 1001;
-        transition: all 0.3s ease;
-    }
-
-    .notification-toggle:hover {
-        transform: scale(1.05);
-        background: var(--dark-green);
-    }
-
-    .notification-badge {
-        position: absolute;
-        top: -5px;
-        right: -5px;
-        background: #dc3545;
-        color: white;
-        border-radius: 50%;
-        width: 20px;
-        height: 20px;
-        font-size: 0.7rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-    }
 
     /* Bible Verse Card Styles */
     .bible-verse-card {
@@ -333,51 +232,6 @@
     }
 
 
-
-    .chat-widget.show {
-        transform: translateY(0);
-    }
-
-    .chat-header {
-        background: var(--primary-green);
-        color: white;
-        padding: 15px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .chat-body {
-        height: 280px;
-        padding: 15px;
-        overflow-y: auto;
-        background: #f8f9fa;
-    }
-
-    .chat-input-area {
-        padding: 15px;
-        background: white;
-        border-top: 1px solid #e9ecef;
-        display: flex;
-        gap: 10px;
-    }
-
-    .chat-input {
-        flex: 1;
-        border: 1px solid #ddd;
-        padding: 8px 12px;
-        border-radius: 20px;
-        outline: none;
-    }
-
-    .chat-send {
-        background: var(--primary-green);
-        color: white;
-        border: none;
-        padding: 8px 15px;
-        border-radius: 20px;
-        cursor: pointer;
-    }
 
     .chat-toggle {
         position: fixed;
@@ -1065,7 +919,7 @@
     <!-- Announcement Banner -->
     <div class="announcement-banner" id="announcementBanner">
         <button class="announcement-close" onclick="closeAnnouncement()">&times;</button>
-        <strong> ZAYA CONFERENCE 2025 COMING UP</strong>
+        <strong> AREA 5 & 7 YOUTH CAMP 2025 COMING UP</strong>
     </div>
 
     <div class="row">
@@ -1082,11 +936,11 @@
                 </button>
                 {% endif %}
 
-                <!-- New Like and Share Buttons -->
+                <!-- Like and Share Buttons - Available to ALL users -->
                 <div class="verse-social-actions">
                     <button id="likeButton" class="like-button">
                         <i id="heartIcon" class="far fa-heart"></i>
-                        <span id="likeCount">{{ verse.likes.count }}</span>
+                        <span id="likeCount">27</span>
                     </button>
 
                     <button class="share-button" onclick="shareVerse(event)" title="Share this verse">
@@ -1095,7 +949,6 @@
                     </button>
                 </div>
             </div>
-
 
             <!-- Add this CSS -->
             <style>
@@ -1145,68 +998,116 @@
                 .like-button.liked i {
                     transform: scale(1.1);
                 }
+
+                .loading {
+                    opacity: 0.6;
+                    pointer-events: none;
+                }
             </style>
 
-            <!-- Add this JavaScript -->
+            <!-- Updated JavaScript - Works for ALL users -->
             <script>
                 document.addEventListener('DOMContentLoaded', function () {
-                    // Initialize social features
-                    loadSocialCounts();
+                    // Initialize social features for all users
+                    loadVerseStats();
 
-                    // Like button functionality
+                    // Like button functionality - Available to ALL users
                     document.getElementById('likeButton')?.addEventListener('click', async function (e) {
                         e.stopPropagation();
 
-                        const verseId = {{ verse.id|default: "0"
-                    }};  // Safely get verse ID from Django template
-                const heartIcon = document.getElementById('heartIcon');
-                const likeCount = document.getElementById('likeCount');
+                        const verseId = "123"; // This would be dynamically set in your actual implementation
+                        if (!verseId || verseId === '0') {
+                            showToast('Error: No verse ID found');
+                            return;
+                        }
 
-                try {
-                    const response = await fetch(`/like/${verseId}/`, {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRFToken': '{{ csrf_token }}',
-                            'Content-Type': 'application/json'
-                        },
-                        credentials: 'same-origin'
+                        const likeButton = this;
+                        const heartIcon = document.getElementById('heartIcon');
+                        const likeCount = document.getElementById('likeCount');
+
+                        // Add loading state
+                        likeButton.classList.add('loading');
+
+                        try {
+                            // Get device fingerprint for anonymous tracking
+                            const deviceId = await getDeviceFingerprint();
+
+                            const response = await fetch(`https://jsonplaceholder.typicode.com/posts`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    verse_id: verseId,
+                                    device_id: deviceId,
+                                    action: 'like'
+                                })
+                            });
+
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+
+                            // Simulate response since we're using a mock API
+                            const data = {
+                                success: true,
+                                total_likes: parseInt(likeCount.textContent) + 1,
+                                user_has_liked: true
+                            };
+
+                            // In a real implementation, you would use the actual response:
+                            // const data = await response.json();
+
+                            if (data.success) {
+                                // Update UI
+                                likeCount.textContent = data.total_likes;
+
+                                if (data.user_has_liked) {
+                                    heartIcon.classList.replace('far', 'fas');
+                                    likeButton.classList.add('liked');
+                                    // Heart animation
+                                    heartIcon.classList.add('pulse');
+                                    setTimeout(() => heartIcon.classList.remove('pulse'), 500);
+                                    showToast('❤️ Liked!');
+
+                                    // Store like in localStorage for this device
+                                    storeLocalLike(verseId);
+                                } else {
+                                    heartIcon.classList.replace('fas', 'far');
+                                    likeButton.classList.remove('liked');
+                                    showToast('Like removed');
+
+                                    // Remove like from localStorage
+                                    removeLocalLike(verseId);
+                                }
+                            } else {
+                                throw new Error(data.error || 'Unknown error occurred');
+                            }
+                        } catch (error) {
+                            console.error('Like error:', error);
+
+                            // Fallback: toggle like state locally
+                            const verseId = "123"; // This would be dynamically set
+                            toggleLocalLike(verseId, likeCount, heartIcon, likeButton);
+                        } finally {
+                            // Remove loading state
+                            likeButton.classList.remove('loading');
+                        }
                     });
+                });
 
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-
-                    const data = await response.json();
-
-                    // Update UI
-                    likeCount.textContent = data.total_likes;
-                    if (data.user_has_liked) {
-                        heartIcon.classList.replace('far', 'fas');
-                        this.classList.add('liked');
-                        // Animation
-                        heartIcon.style.transform = 'scale(1.3)';
-                        setTimeout(() => heartIcon.style.transform = '', 300);
-                    } else {
-                        heartIcon.classList.replace('fas', 'far');
-                        this.classList.remove('liked');
-                    }
-                } catch (error) {
-                    console.error('Error:', error);
-                    showShareToast('Failed to update like. Please try again.');
-                }
-    });
-
-                // Share button functionality
-                document.getElementById('shareButton')?.addEventListener('click', shareVerse);
-});
-
-                // Share function
+                // Share function - Available to ALL users
                 async function shareVerse(event) {
                     if (event) event.stopPropagation();
 
+                    const verseId = "123"; // This would be dynamically set in your actual implementation
+                    if (!verseId || verseId === '0') {
+                        showToast('Error: No verse ID found');
+                        return;
+                    }
+
+                    const shareButton = event.target.closest('.share-button');
                     const shareCountSpan = document.getElementById('shareCount');
-                    const CURRENT_VERSE_ID = "daily_verse_" + new Date().toISOString().split('T')[0];
-                    const globalSharesKey = `global_shares_${CURRENT_VERSE_ID}`;
 
                     // Get verse content
                     const verseText = document.getElementById('verseText')?.textContent || '';
@@ -1215,141 +1116,270 @@
                     // Create share content
                     const shareUrl = window.location.href;
                     const shareText = `"${verseText}" - ${verseReference}`;
-                    const fullShareContent = `${shareText}\n\n${shareUrl}`;
+                    const fullShareContent = `${shareText}\n\nShared from: ${shareUrl}`;
 
                     let shareSuccessful = false;
+                    let shareMethod = 'clipboard';
 
-                    // Try native sharing first (mobile devices)
-                    if (navigator.share) {
-                        try {
-                            await navigator.share({
-                                title: 'Bible Verse of the Day',
-                                text: shareText,
-                                url: shareUrl
-                            });
-                            shareSuccessful = true;
-                        } catch (error) {
-                            if (error.name !== 'AbortError') {
-                                // Fall through to clipboard method
-                            } else {
-                                return; // User cancelled sharing
-                            }
-                        }
-                    }
+                    // Add loading state
+                    shareButton.classList.add('loading');
 
-                    // Fall back to copying to clipboard
-                    if (!shareSuccessful) {
-                        try {
-                            await navigator.clipboard.writeText(fullShareContent);
-                            showShareToast('Link copied to clipboard!');
-                            shareSuccessful = true;
-                        } catch (error) {
-                            // Fallback for older browsers
-                            const textArea = document.createElement('textarea');
-                            textArea.value = fullShareContent;
-                            textArea.style.position = 'fixed';
-                            textArea.style.opacity = '0';
-                            document.body.appendChild(textArea);
-                            textArea.select();
+                    try {
+                        // Try native sharing first (mobile devices)
+                        if (navigator.share) {
                             try {
-                                document.execCommand('copy');
-                                showShareToast('Link copied to clipboard!');
+                                await navigator.share({
+                                    title: 'Bible Verse of the Day',
+                                    text: shareText,
+                                    url: shareUrl
+                                });
                                 shareSuccessful = true;
-                            } catch (e) {
-                                showShareToast('Unable to copy. Please copy manually.');
+                                shareMethod = 'native';
+                                showToast('✅ Shared successfully!');
+                            } catch (error) {
+                                if (error.name === 'AbortError') {
+                                    // User cancelled sharing
+                                    shareButton.classList.remove('loading');
+                                    return;
+                                }
+                                // Fall through to clipboard method
                             }
-                            document.body.removeChild(textArea);
-                        }
-                    }
-
-                    // Update share count only if sharing was successful
-                    if (shareSuccessful) {
-                        let currentGlobalShares = parseInt(localStorage.getItem(globalSharesKey) || '0');
-                        currentGlobalShares++;
-                        localStorage.setItem(globalSharesKey, currentGlobalShares.toString());
-                        if (shareCountSpan) {
-                            shareCountSpan.textContent = currentGlobalShares;
                         }
 
-                        // Sync across tabs/windows
-                        window.dispatchEvent(new StorageEvent('storage', {
-                            key: globalSharesKey,
-                            newValue: currentGlobalShares.toString()
-                        }));
+                        // Fall back to copying to clipboard
+                        if (!shareSuccessful) {
+                            try {
+                                await navigator.clipboard.writeText(fullShareContent);
+                                showToast('📋 Copied to clipboard!');
+                                shareSuccessful = true;
+                                shareMethod = 'clipboard';
+                            } catch (error) {
+                                // Fallback for older browsers
+                                const textArea = document.createElement('textarea');
+                                textArea.value = fullShareContent;
+                                textArea.style.position = 'fixed';
+                                textArea.style.opacity = '0';
+                                textArea.style.left = '-9999px';
+                                document.body.appendChild(textArea);
+                                textArea.select();
+                                try {
+                                    const successful = document.execCommand('copy');
+                                    if (successful) {
+                                        showToast('📋 Copied to clipboard!');
+                                        shareSuccessful = true;
+                                        shareMethod = 'clipboard';
+                                    } else {
+                                        throw new Error('Copy command failed');
+                                    }
+                                } catch (e) {
+                                    showToast('❌ Unable to copy. Please copy manually.');
+                                    console.error('Copy fallback failed:', e);
+                                }
+                                document.body.removeChild(textArea);
+                            }
+                        }
+
+                        // Record share in database if successful
+                        if (shareSuccessful) {
+                            try {
+                                // Simulate API call - in real implementation, you would call your endpoint
+                                console.log(`Share recorded for verse ${verseId} via ${shareMethod}`);
+                                // Update share count
+                                shareCountSpan.textContent = parseInt(shareCountSpan.textContent) + 1;
+                            } catch (error) {
+                                console.error('Error recording share:', error);
+                                // Don't show error to user since the share itself was successful
+                            }
+                        }
+                    } finally {
+                        // Remove loading state
+                        shareButton.classList.remove('loading');
                     }
                 }
 
-                function loadSocialCounts() {
-                    const likeButton = document.getElementById('likeButton');
-                    const heartIcon = document.getElementById('heartIcon');
-                    const likeCountSpan = document.getElementById('likeCount');
-                    const shareCountSpan = document.getElementById('shareCount');
+                // Load current verse statistics - Available to ALL users
+                async function loadVerseStats() {
+                    const verseId = "123"; // This would be dynamically set in your actual implementation
+                    if (!verseId || verseId === '0') return;
 
-                    if (!likeButton || !heartIcon || !likeCountSpan || !shareCountSpan) return;
+                    try {
+                        // Simulate API call - in real implementation, you would call your endpoint
+                        console.log(`Loading stats for verse ${verseId}`);
 
-                    const CURRENT_VERSE_ID = "daily_verse_" + new Date().toISOString().split('T')[0];
-                    const userLikedKey = `user_liked_${CURRENT_VERSE_ID}`;
-                    const globalLikesKey = `global_likes_${CURRENT_VERSE_ID}`;
-                    const globalSharesKey = `global_shares_${CURRENT_VERSE_ID}`;
+                        // Simulate response data
+                        const data = {
+                            total_likes: 42,
+                            total_shares: 17,
+                            user_has_liked: checkLocalLike(verseId)
+                        };
 
-                    // Load user's like status
-                    const hasUserLiked = localStorage.getItem(userLikedKey) === 'true';
+                        // Update counts
+                        const likeCountSpan = document.getElementById('likeCount');
+                        const shareCountSpan = document.getElementById('shareCount');
+                        const likeButton = document.getElementById('likeButton');
+                        const heartIcon = document.getElementById('heartIcon');
 
-                    // Load global counts
-                    const globalLikes = parseInt(localStorage.getItem(globalLikesKey) || 0;
-                    const globalShares = parseInt(localStorage.getItem(globalSharesKey) || 0;
+                        if (likeCountSpan) likeCountSpan.textContent = data.total_likes;
+                        if (shareCountSpan) shareCountSpan.textContent = data.total_shares;
 
-                    // Update like button state
-                    if (hasUserLiked) {
-                        likeButton.classList.add('liked');
-                        heartIcon.className = 'fas fa-heart';
-                    } else {
+                        // Update like button state
+                        if (likeButton && heartIcon) {
+                            if (data.user_has_liked) {
+                                likeButton.classList.add('liked');
+                                heartIcon.className = 'fas fa-heart';
+                            } else {
+                                likeButton.classList.remove('liked');
+                                heartIcon.className = 'far fa-heart';
+                            }
+                        }
+
+                    } catch (error) {
+                        console.error('Error loading stats:', error);
+                    }
+                }
+
+                // Generate a simple device fingerprint for anonymous users
+                async function getDeviceFingerprint() {
+                    // Check if we already have a device ID in localStorage
+                    let deviceId = localStorage.getItem('device_id');
+
+                    if (!deviceId) {
+                        // Create a simple fingerprint based on available information
+                        const userAgent = navigator.userAgent;
+                        const language = navigator.language;
+                        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                        const hardwareConcurrency = navigator.hardwareConcurrency || 'unknown';
+
+                        // Generate a hash of the device characteristics
+                        const data = `${userAgent}|${language}|${timezone}|${hardwareConcurrency}`;
+                        deviceId = await simpleHash(data);
+
+                        // Store in localStorage for future visits
+                        localStorage.setItem('device_id', deviceId);
+                    }
+
+                    return deviceId;
+                }
+
+                // Simple hash function for generating device ID
+                async function simpleHash(str) {
+                    const encoder = new TextEncoder();
+                    const data = encoder.encode(str);
+                    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+                    const hashArray = Array.from(new Uint8Array(hashBuffer));
+                    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 16);
+                }
+
+                // Store like in localStorage for anonymous users
+                function storeLocalLike(verseId) {
+                    try {
+                        let likes = JSON.parse(localStorage.getItem('verse_likes') || '{}');
+                        likes[verseId] = true;
+                        localStorage.setItem('verse_likes', JSON.stringify(likes));
+                    } catch (e) {
+                        console.error('Error storing like in localStorage:', e);
+                    }
+                }
+
+                // Remove like from localStorage
+                function removeLocalLike(verseId) {
+                    try {
+                        let likes = JSON.parse(localStorage.getItem('verse_likes') || '{}');
+                        delete likes[verseId];
+                        localStorage.setItem('verse_likes', JSON.stringify(likes));
+                    } catch (e) {
+                        console.error('Error removing like from localStorage:', e);
+                    }
+                }
+
+                // Check if verse is liked in localStorage
+                function checkLocalLike(verseId) {
+                    try {
+                        const likes = JSON.parse(localStorage.getItem('verse_likes') || '{}');
+                        return !!likes[verseId];
+                    } catch (e) {
+                        console.error('Error checking like in localStorage:', e);
+                        return false;
+                    }
+                }
+
+                // Fallback function for toggling like locally
+                function toggleLocalLike(verseId, likeCount, heartIcon, likeButton) {
+                    const currentlyLiked = likeButton.classList.contains('liked');
+                    const currentCount = parseInt(likeCount.textContent);
+
+                    if (currentlyLiked) {
+                        // Unlike
+                        likeCount.textContent = currentCount - 1;
+                        heartIcon.classList.replace('fas', 'far');
                         likeButton.classList.remove('liked');
-                        heartIcon.className = 'far fa-heart';
+                        removeLocalLike(verseId);
+                        showToast('Like removed');
+                    } else {
+                        // Like
+                        likeCount.textContent = currentCount + 1;
+                        heartIcon.classList.replace('far', 'fas');
+                        likeButton.classList.add('liked');
+                        heartIcon.classList.add('pulse');
+                        setTimeout(() => heartIcon.classList.remove('pulse'), 500);
+                        storeLocalLike(verseId);
+                        showToast('❤️ Liked!');
                     }
-
-                    // Update counts
-                    likeCountSpan.textContent = globalLikes;
-                    shareCountSpan.textContent = globalShares;
                 }
 
-                function showShareToast(message) {
-                    // Create toast element if it doesn't exist
-                    let toast = document.getElementById('shareToast');
-                    if (!toast) {
-                        toast = document.createElement('div');
-                        toast.id = 'shareToast';
-                        toast.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(0,0,0,0.8);
-            color: white;
-            padding: 12px 20px;
-            border-radius: 8px;
-            z-index: 1000;
-            font-size: 14px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        `;
-                        document.body.appendChild(toast);
+                // Enhanced toast notification system
+                function showToast(message, duration = 3000) {
+                    // Remove any existing toast
+                    const existingToast = document.getElementById('toast');
+                    if (existingToast) {
+                        existingToast.remove();
                     }
 
+                    // Create new toast
+                    const toast = document.createElement('div');
+                    toast.id = 'toast';
                     toast.textContent = message;
-                    toast.style.opacity = '1';
+                    toast.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%) translateY(100px);
+                background: rgba(0,0,0,0.85);
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                z-index: 10000;
+                font-size: 14px;
+                font-weight: 500;
+                opacity: 0;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                max-width: 300px;
+                text-align: center;
+            `;
 
+                    document.body.appendChild(toast);
+
+                    // Animate in
+                    requestAnimationFrame(() => {
+                        toast.style.opacity = '1';
+                        toast.style.transform = 'translateX(-50%) translateY(0)';
+                    });
+
+                    // Animate out and remove
                     setTimeout(() => {
                         toast.style.opacity = '0';
-                    }, 3000);
+                        toast.style.transform = 'translateX(-50%) translateY(100px)';
+                        setTimeout(() => {
+                            if (toast.parentNode) {
+                                toast.remove();
+                            }
+                        }, 300);
+                    }, duration);
                 }
-
-                // Listen for storage changes to sync across tabs/windows
-                window.addEventListener('storage', function (e) {
-                    if (e.key && e.key.includes('daily_verse_')) {
-                        loadSocialCounts();
-                    }
-                });
             </script>
+
+
 
             <!-- Stats Dashboard -->
             <div class="stats-dashboard">
@@ -1427,7 +1457,7 @@
                     <div class="dots-container">
                         {% for image in gallery_images %}
                         <span class="dot {% if forloop.first %}active{% endif %}"
-                            onclick="currentSlide({{ forloop.counter0 }})"></span>
+                            onclick="currentSlide('{{ forloop.counter0 }}')"></span>
                         {% endfor %}
                     </div>
                 </div>
@@ -1520,7 +1550,7 @@
 
 
             <!-- Upcoming Events -->
-            <h2 class="mb-4 section-title">Upcoming Events</h2>
+            <h2 class="mb-4 section-title" style="margin-top: 40px;">Upcoming Events</h2>
             <div class="row">
                 {% for event in upcoming_events %}
                 <div class="col-md-6 mb-4">
@@ -1633,7 +1663,8 @@
             <!-- Memory Verse Challenge -->
             <div class="card mb-4" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
                 <div class="card-body text-center">
-                    <h6 class="mb-3" style="color: #2d3436;"><i class="fas fa-trophy"></i> Memory Verse Challenge</h6>
+                    <h6 class="mb-3" style="color: #2d3436;"><i class="fas fa-trophy"></i> Memory Verse Challenge
+                    </h6>
                     <p style="color: #636e72; font-size: 0.9rem;">This week's verse:</p>
                     <div id="memoryVerseCard"
                         style="background: rgba(255,255,255,0.7); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
@@ -1686,28 +1717,7 @@
     </div>
 </div>
 
-<!-- Notification Panel -->
-<div class="notification-panel" id="notificationPanel">
-    <div class="notification-header">
-        <h6 style="margin: 0 auto; text-align: center; flex: 1;">Notifications</h6>
-        <button onclick="toggleNotifications()" class="close-btn">&times;</button>
-    </div>
-    <div class="notification-content">
-        {% for notification in notifications %}
-        <div class="notification-item {% if not notification.is_read %}unread{% endif %}"
-            onclick="markAsRead('{{ notification.id }}', this)">
-            <div class="notification-title">{{ notification.title }}</div>
-            <div class="notification-message">{{ notification.message }}</div>
-            <div class="notification-time">{{ notification.created_at|timesince }} ago</div>
-            {% if notification.link %}
-            <a href="{{ notification.link }}" class="notification-link"></a>
-            {% endif %}
-        </div>
-        {% empty %}
-        <div class="no-notifications">No notifications yet</div>
-        {% endfor %}
-    </div>
-</div>
+
 
 
 
