@@ -633,3 +633,69 @@ def like_verse(request, verse_id):
         'user_has_liked': created
     }) 
     
+from django.http import JsonResponse
+from django.utils import timezone
+from datetime import timedelta
+from django.views.decorators.http import require_GET, require_POST
+from django.views.decorators.csrf import csrf_exempt
+from django.db import transaction
+from .models import ActiveConnection
+import json
+
+@require_GET
+def exact_online_users(request):
+    """Get exact count of currently online users"""
+    five_minutes_ago = timezone.now() - timedelta(minutes=5)
+    
+    try:
+        # Count active connections from last 5 minutes
+        online_count = ActiveConnection.objects.filter(
+            last_heartbeat__gte=five_minutes_ago,
+            is_active=True
+        ).count()
+        
+        return JsonResponse({
+            'online_count': online_count,
+            'timestamp': timezone.now().isoformat(),
+            'status': 'success'
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'online_count': 0,
+            'status': 'error',
+            'message': str(e)
+        })
+
+@csrf_exempt
+@require_POST
+def connection_heartbeat(request):
+    """Update connection heartbeat"""
+    try:
+        data = json.loads(request.body)
+        session_key = request.session.session_key
+        
+        if not session_key:
+            return JsonResponse({'status': 'error', 'message': 'No session'})
+        
+        with transaction.atomic():
+            # Update heartbeat timestamp
+            updated = ActiveConnection.objects.filter(
+                session_key=session_key,
+                is_active=True
+            ).update(last_heartbeat=timezone.now())
+            
+            if updated == 0:
+                # Create new connection if not exists
+                ActiveConnection.objects.create(
+                    session_key=session_key,
+                    user=request.user if request.user.is_authenticated else None,
+                    ip_address=request.META.get('REMOTE_ADDR'),
+                    user_agent=request.META.get('HTTP_USER_AGENT', '')[:500],
+                    last_heartbeat=timezone.now()
+                )
+        
+        return JsonResponse({'status': 'success'})
+        
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)})

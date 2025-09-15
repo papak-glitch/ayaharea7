@@ -363,3 +363,35 @@ class AnonymousVerseInteraction(models.Model):
                 existing.delete()
         
         super().save(*args, **kwargs)
+
+from django.db import models
+from django.contrib.auth.models import User
+from django.utils import timezone
+import uuid
+from django.db.models import Sum
+
+class ActiveConnection(models.Model):
+    connection_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
+    session_key = models.CharField(max_length=40, db_index=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.TextField(blank=True)
+    last_heartbeat = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now)
+    is_active = models.BooleanField(default=True)
+    
+    class Meta:
+        indexes = [
+            models.Index(fields=['last_heartbeat', 'is_active']),
+            models.Index(fields=['session_key']),
+        ]
+
+class VisitorProfile(models.Model):
+    visitor_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    user = models.OneToOneField(User, null=True, blank=True, on_delete=models.CASCADE)
+    first_seen = models.DateTimeField(default=timezone.now)
+    last_seen = models.DateTimeField(default=timezone.now)
+    total_visits = models.PositiveIntegerField(default=0)
+    
+    def __str__(self):
+        return f"Visitor {self.visitor_id}"        

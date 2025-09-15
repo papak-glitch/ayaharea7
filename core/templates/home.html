@@ -1404,25 +1404,25 @@
                 <div class="row">
                     <div class="col-md-3 col-6 mb-3">
                         <div class="stat-item">
-                            <div class="stat-number" id="memberCount">247</div>
+                            <div class="stat-number" id="memberCount">0</div>
                             <div class="stat-label">Active Members</div>
                         </div>
                     </div>
                     <div class="col-md-3 col-6 mb-3">
                         <div class="stat-item">
-                            <div class="stat-number" id="eventCount">12</div>
+                            <div class="stat-number" id="eventCount">0</div>
                             <div class="stat-label">This Month</div>
                         </div>
                     </div>
                     <div class="col-md-3 col-6 mb-3">
                         <div class="stat-item">
-                            <div class="stat-number" id="prayerCount">89</div>
+                            <div class="stat-number" id="prayerCount">0</div>
                             <div class="stat-label">Prayer Requests</div>
                         </div>
                     </div>
                     <div class="col-md-3 col-6 mb-3">
                         <div class="stat-item">
-                            <div class="stat-number" id="onlineCount">23</div>
+                            <div class="stat-number" id="onlineCount">0</div>
                             <div class="stat-label">Online Now</div>
                         </div>
                     </div>
@@ -1744,104 +1744,6 @@
 </button>
 
 <script>
-    // Initialize Bible Verse - Moved to top of script section
-    function initializeDailyVerse() {
-        try {
-            const bibleVerses = [
-                {
-                    id: 1,
-                    text: "Flee from sexual immorality. All other sins a person commits are outside the body, but whoever sins sexually, sins against their own body.",
-                    reference: "1 Corinthians 6:18"
-                },
-                {
-                    id: 2,
-                    text: "But among you there must not be even a hint of sexual immorality, or of any kind of impurity, or of greed, because these are improper for God’s holy people.",
-                    reference: "Ephesians 5:3"
-                },
-                {
-                    id: 3,
-                    text: "For this is the will of God, your sanctification: that you abstain from sexual immorality;",
-                    reference: "1 Thessalonians 4:3"
-                },
-                {
-                    id: 4,
-                    text: "Marriage should be honored by all, and the marriage bed kept pure, for God will judge the adulterer and all the sexually immoral.",
-                    reference: "Hebrews 13:4"
-                },
-                {
-                    id: 5,
-                    text: "But I tell you that anyone who looks at a woman lustfully has already committed adultery with her in his heart.",
-                    reference: "Matthew 5:28"
-                },
-                {
-                    id: 6,
-                    text: "Put to death, therefore, whatever belongs to your earthly nature: sexual immorality, impurity, lust, evil desires and greed, which is idolatry.",
-                    reference: "Colossians 3:5"
-                },
-                {
-                    id: 7,
-                    text: "The body is not meant for sexual immorality but for the Lord, and the Lord for the body.",
-                    reference: "1 Corinthians 6:13"
-                },
-                {
-                    id: 8,
-                    text: "Let us behave decently, as in the daytime, not in carousing and drunkenness, not in sexual immorality and debauchery, not in dissension and jealousy.",
-                    reference: "Romans 13:13"
-                }
-            ];
-
-            // Ensure elements exist
-            const verseTextEl = document.getElementById('verseText');
-            const verseRefEl = document.getElementById('verseReference');
-
-            if (verseTextEl && verseRefEl) {
-                // Use the day of year for daily randomization
-                const now = new Date();
-                const start = new Date(now.getFullYear(), 0, 0);
-                const diff = now - start;
-                const oneDay = 1000 * 60 * 60 * 24;
-                const dayOfYear = Math.floor(diff / oneDay);
-                const index = dayOfYear % bibleVerses.length;
-                const verse = bibleVerses[index];
-
-                // Store the verse id globally for use elsewhere
-                window.currentVerseId = verse.id;
-
-                verseTextEl.textContent = verse.text;
-                verseRefEl.textContent = verse.reference;
-
-                // Also set the modal content in case it's opened
-                document.getElementById('modalVerseText').textContent = verse.text;
-                document.getElementById('modalVerseReference').textContent = verse.reference;
-            } else {
-                console.error("Verse elements not found");
-            }
-        } catch (error) {
-            console.error("Error initializing daily verse:", error);
-        }
-    }
-
-    // Call this immediately
-    initializeDailyVerse();
-
-    // Rest of your existing JavaScript remains exactly the same...
-    // All your other functions stay unchanged
-    // Set daily background based on day of week
-    function setDailyBackground() {
-        const days = ['day1', 'day2', 'day3', 'day4', 'day5', 'day6', 'day7'];
-        const today = new Date().getDay(); // 0-6
-        const card = document.querySelector('.bible-verse-card');
-
-        // Remove all day classes
-        card.classList.remove(...days);
-        // Add today's class
-        card.classList.add(days[today]);
-    }
-
-    // Call this when page loads
-    document.addEventListener('DOMContentLoaded', function () {
-        setDailyBackground();
-    });
 
 
 
@@ -2023,18 +1925,18 @@
     function initializeMemoryVerse() {
         try {
             const memoryVerses = [
-                { text: "Let your light shine before others, that they may see your good deeds and glorify your Father in heaven.", reference: "Matthew 5:16" },
-                { text: "Rejoice always, pray continually, give thanks in all circumstances.", reference: "1 Thessalonians 5:16-18" },
-                { text: "Do not let your hearts be troubled. Trust in God; trust also in me.", reference: "John 14:1" },
-                { text: "The Lord is near to all who call on him, to all who call on him in truth.", reference: "Psalm 145:18" },
-                { text: "Therefore encourage one another and build each other up.", reference: "1 Thessalonians 5:11" },
-                { text: "He gives strength to the weary and increases the power of the weak.", reference: "Isaiah 40:29" },
-                { text: "Let us not become weary in doing good, for at the proper time we will reap a harvest if we do not give up.", reference: "Galatians 6:9" },
-                { text: "The name of the Lord is a fortified tower; the righteous run to it and are safe.", reference: "Proverbs 18:10" },
-                { text: "Above all, love each other deeply, because love covers over a multitude of sins.", reference: "1 Peter 4:8" },
-                { text: "My grace is sufficient for you, for my power is made perfect in weakness.", reference: "2 Corinthians 12:9" },
-                { text: "Be kind and compassionate to one another, forgiving each other, just as in Christ God forgave you.", reference: "Ephesians 4:32" },
-                { text: "The Lord will fight for you; you need only to be still.", reference: "Exodus 14:14" }
+                { text: "He heals the brokenhearted and binds up their wounds.", reference: "Psalm 147:3" },
+                { text: "The Lord is close to the brokenhearted and saves those who are crushed in spirit.", reference: "Psalm 34:18" },
+                { text: "Cast all your anxiety on Him because He cares for you.", reference: "1 Peter 5:7" },
+                { text: "Come to me, all you who are weary and burdened, and I will give you rest.", reference: "Matthew 11:28" },
+                { text: "For I know the plans I have for you, declares the Lord, plans to prosper you and not to harm you, plans to give you hope and a future.", reference: "Jeremiah 29:11" },
+                { text: "Even though I walk through the darkest valley, I will fear no evil, for you are with me.", reference: "Psalm 23:4" },
+                { text: "But those who hope in the Lord will renew their strength. They will soar on wings like eagles.", reference: "Isaiah 40:31" },
+                { text: "Weeping may stay for the night, but rejoicing comes in the morning.", reference: "Psalm 30:5" },
+                { text: "Be strong and courageous. Do not be afraid; do not be discouraged, for the Lord your God will be with you wherever you go.", reference: "Joshua 1:9" },
+                { text: "God is our refuge and strength, an ever-present help in trouble.", reference: "Psalm 46:1" },
+                { text: "Forget the former things; do not dwell on the past. See, I am doing a new thing!", reference: "Isaiah 43:18-19" },
+                { text: "I can do all things through Christ who strengthens me.", reference: "Philippians 4:13" }
             ];
 
             // Ensure elements exist
@@ -2234,6 +2136,113 @@
 
         updateButtonStates(eventId);
         await sendToServer(eventId, action, isAdding);
+
+        // Exact online users tracking
+        (function () {
+            const onlineCountElement = document.getElementById('onlineCount');
+            if (!onlineCountElement) return;
+
+            let heartbeatInterval;
+            let updateInterval;
+            let isTabActive = true;
+
+            // Function to update online count
+            function updateOnlineCount() {
+                if (!isTabActive) return;
+
+                fetch('/api/online-users/exact/')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            onlineCountElement.textContent = data.online_count;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Failed to update online count:', error);
+                    });
+            }
+
+            // Function to send heartbeat
+            function sendHeartbeat() {
+                if (!isTabActive) return;
+
+                fetch('/api/connection/heartbeat/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCSRFToken()
+                    },
+                    body: JSON.stringify({})
+                }).catch(error => {
+                    console.error('Heartbeat failed:', error);
+                });
+            }
+
+            // Get CSRF token
+            function getCSRFToken() {
+                const name = 'csrftoken';
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+
+            // Handle tab visibility changes
+            document.addEventListener('visibilitychange', function () {
+                isTabActive = !document.hidden;
+                if (isTabActive) {
+                    // Tab became active, update immediately
+                    sendHeartbeat();
+                    updateOnlineCount();
+                }
+            });
+
+            // Handle page focus
+            window.addEventListener('focus', function () {
+                isTabActive = true;
+                sendHeartbeat();
+                updateOnlineCount();
+            });
+
+            window.addEventListener('blur', function () {
+                isTabActive = false;
+            });
+
+            // Start intervals
+            function startTracking() {
+                // Initial update
+                updateOnlineCount();
+                sendHeartbeat();
+
+                // Update count every 30 seconds
+                updateInterval = setInterval(updateOnlineCount, 30000);
+
+                // Send heartbeat every 60 seconds
+                heartbeatInterval = setInterval(sendHeartbeat, 60000);
+            }
+
+            // Stop intervals
+            function stopTracking() {
+                clearInterval(updateInterval);
+                clearInterval(heartbeatInterval);
+            }
+
+            // Start when page loads
+            document.addEventListener('DOMContentLoaded', startTracking);
+
+            // Clean up when page unloads
+            window.addEventListener('beforeunload', stopTracking);
+            window.addEventListener('unload', stopTracking);
+
+        })();
     }
 </script>
 {% endblock %}

@@ -35,6 +35,9 @@ urlpatterns = [
     
     # Get verse statistics - accessible to everyone
     path('stats/<int:verse_id>/', views.get_verse_stats, name='verse_stats'),
+
+    path('api/online-users/exact/', views.exact_online_users, name='exact_online_users'),
+    path('api/connection/heartbeat/', views.connection_heartbeat, name='connection_heartbeat'),
     
 
 ]
