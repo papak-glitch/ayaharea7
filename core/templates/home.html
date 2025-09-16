@@ -1083,7 +1083,43 @@
                         }
                     });
                 });
+                // Bible verses for daily refresh
+                const bibleVerses = [
+                    { text: "He heals the brokenhearted and binds up their wounds.", reference: "Psalm 147:3" },
+                    { text: "The Lord is close to the brokenhearted and saves those who are crushed in spirit.", reference: "Psalm 34:18" },
+                    { text: "Cast all your anxiety on Him because He cares for you.", reference: "1 Peter 5:7" },
+                    { text: "Come to me, all you who are weary and burdened, and I will give you rest.", reference: "Matthew 11:28" },
+                    { text: "For I know the plans I have for you, declares the Lord, plans to prosper you and not to harm you, plans to give you hope and a future.", reference: "Jeremiah 29:11" },
+                    { text: "Even though I walk through the darkest valley, I will fear no evil, for you are with me.", reference: "Psalm 23:4" },
+                    { text: "But those who hope in the Lord will renew their strength. They will soar on wings like eagles.", reference: "Isaiah 40:31" },
+                    { text: "Weeping may stay for the night, but rejoicing comes in the morning.", reference: "Psalm 30:5" },
+                    { text: "Be strong and courageous. Do not be afraid; do not be discouraged, for the Lord your God will be with you wherever you go.", reference: "Joshua 1:9" },
+                    { text: "God is our refuge and strength, an ever-present help in trouble.", reference: "Psalm 46:1" },
+                    { text: "Forget the former things; do not dwell on the past. See, I am doing a new thing!", reference: "Isaiah 43:18-19" },
+                    { text: "I can do all things through Christ who strengthens me.", reference: "Philippians 4:13" }
+                ];
 
+                // Set daily verse based on the current day of the year
+                function setDailyVerse() {
+                    const today = new Date();
+                    const start = new Date(today.getFullYear(), 0, 0);
+                    const diff = today - start;
+                    const oneDay = 1000 * 60 * 60 * 24;
+                    const dayOfYear = Math.floor(diff / oneDay);
+
+                    const index = dayOfYear % bibleVerses.length;
+                    const verse = bibleVerses[index];
+
+                    document.getElementById('verseText').textContent = verse.text;
+                    document.getElementById('verseReference').textContent = verse.reference;
+
+                    // Save to localStorage for refresh/consistency
+                    localStorage.setItem('dailyVerse', JSON.stringify(verse));
+                    localStorage.setItem('dailyVerseDate', today.toDateString());
+                }
+
+                // Call setDailyVerse on page load
+                setDailyVerse();
                 // Share function - Available to ALL users
                 async function shareVerse(event) {
                     if (event) event.stopPropagation();

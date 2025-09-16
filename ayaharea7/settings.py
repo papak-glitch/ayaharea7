@@ -39,11 +39,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core',  # Custom app for the project
-    'analytics',
+    
 ]
 
 MIDDLEWARE = [
-    'analytics.middleware.ExactOnlineUsersMiddleware',
+    'core.middleware.ExactOnlineUsersMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
