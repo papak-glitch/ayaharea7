@@ -197,21 +197,6 @@ class MediaImage(models.Model):
 
 
 
-class Notification(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    title = models.CharField(max_length=100)
-    message = models.TextField()
-    is_read = models.BooleanField(default=False)
-    created_at = models.DateTimeField(default=timezone.now)
-    link = models.URLField(blank=True, null=True)
-    notification_type = models.CharField(max_length=50, blank=True, null=True)
-
-    class Meta:
-        ordering = ['-created_at']
-
-    def __str__(self):
-        return f"{self.title} - {self.user.username}"    
-
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -231,167 +216,33 @@ class GalleryImage(models.Model):
     def __str__(self):
         return self.title or f"Gallery Image {self.id}"
     
-# models.py
 from django.db import models
-from django.contrib.auth.models import User
-from django.utils import timezone
-
-class BibleVerse(models.Model):
-    text = models.TextField()
-    reference = models.CharField(max_length=100)
-    book = models.CharField(max_length=50)
-    chapter = models.IntegerField()
-    verse_start = models.IntegerField()
-    verse_end = models.IntegerField(null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    is_daily = models.BooleanField(default=False)
-    daily_date = models.DateField(null=True, blank=True, unique=True)
-    
-    class Meta:
-        ordering = ['-created_at']
-        indexes = [
-            models.Index(fields=['daily_date']),
-            models.Index(fields=['is_daily']),
-        ]
-    
-    def __str__(self):
-        return f"{self.reference}: {self.text[:50]}..."
-    
-    @property
-    def total_likes(self):
-        """Get total likes from both authenticated and anonymous users"""
-        auth_likes = self.likes.count()
-        anon_likes = AnonymousVerseInteraction.objects.filter(
-            verse=self, interaction_type='like'
-        ).count()
-        return auth_likes + anon_likes
-    
-    @property
-    def total_shares(self):
-        """Get total shares from both authenticated and anonymous users"""
-        auth_shares = self.shares.count()
-        anon_shares = AnonymousVerseInteraction.objects.filter(
-            verse=self, interaction_type='share'
-        ).count()
-        return auth_shares + anon_shares
-    
-    def user_has_liked(self, user=None, ip_address=None, session_key=None):
-        """Check if user has liked this verse"""
-        if user and user.is_authenticated:
-            return self.likes.filter(user=user).exists()
-        elif ip_address and session_key:
-            return AnonymousVerseInteraction.objects.filter(
-                verse=self,
-                ip_address=ip_address,
-                session_key=session_key,
-                interaction_type='like'
-            ).exists()
-        return False
-
-class VerseLike(models.Model):
-    """Likes from authenticated users"""
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    verse = models.ForeignKey(BibleVerse, on_delete=models.CASCADE, related_name='likes')
-    created_at = models.DateTimeField(auto_now_add=True)
-    ip_address = models.GenericIPAddressField(null=True, blank=True)
-    
-    class Meta:
-        unique_together = ('user', 'verse')
-        ordering = ['-created_at']
-    
-    def __str__(self):
-        return f"{self.user.username} likes {self.verse.reference}"
-
-class VerseShare(models.Model):
-    """Shares from authenticated users"""
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    verse = models.ForeignKey(BibleVerse, on_delete=models.CASCADE, related_name='shares')
-    created_at = models.DateTimeField(auto_now_add=True)
-    ip_address = models.GenericIPAddressField(null=True, blank=True)
-    share_method = models.CharField(
-        max_length=20,
-        choices=[
-            ('native', 'Native Share'),
-            ('clipboard', 'Clipboard'),
-            ('social', 'Social Media'),
-        ],
-        default='clipboard'
-    )
-    
-    class Meta:
-        ordering = ['-created_at']
-    
-    def __str__(self):
-        user_display = self.user.username if self.user else f"Anonymous ({self.ip_address})"
-        return f"{user_display} shared {self.verse.reference}"
-
-class AnonymousVerseInteraction(models.Model):
-    """Interactions from anonymous users (likes and shares)"""
-    verse = models.ForeignKey(BibleVerse, on_delete=models.CASCADE, related_name='anonymous_interactions')
-    ip_address = models.GenericIPAddressField()
-    session_key = models.CharField(max_length=40, null=True, blank=True)
-    interaction_type = models.CharField(
-        max_length=10,
-        choices=[('like', 'Like'), ('share', 'Share')]
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-    user_agent = models.TextField(null=True, blank=True)  # Optional: track device info
-    
-    class Meta:
-        # Allow only one like per IP+session+verse, but multiple shares
-        indexes = [
-            models.Index(fields=['verse', 'interaction_type']),
-            models.Index(fields=['ip_address', 'session_key']),
-        ]
-        ordering = ['-created_at']
-    
-    def __str__(self):
-        return f"Anonymous {self.interaction_type} for {self.verse.reference} from {self.ip_address}"
-    
-    def save(self, *args, **kwargs):
-        # For likes, ensure uniqueness per IP+session+verse
-        if self.interaction_type == 'like':
-            existing = AnonymousVerseInteraction.objects.filter(
-                verse=self.verse,
-                ip_address=self.ip_address,
-                session_key=self.session_key,
-                interaction_type='like'
-            ).exclude(pk=self.pk)
-            
-            if existing.exists():
-                # Delete existing like before creating new one
-                existing.delete()
-        
-        super().save(*args, **kwargs)
-
-from django.db import models
-from django.contrib.auth.models import User
 from django.utils import timezone
 import uuid
-from django.db.models import Sum
 
-class ActiveConnection(models.Model):
-    connection_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
-    session_key = models.CharField(max_length=40, db_index=True)
-    ip_address = models.GenericIPAddressField(null=True, blank=True)
-    user_agent = models.TextField(blank=True)
-    last_heartbeat = models.DateTimeField(default=timezone.now)
-    created_at = models.DateTimeField(default=timezone.now)
-    is_active = models.BooleanField(default=True)
-    
-    class Meta:
-        indexes = [
-            models.Index(fields=['last_heartbeat', 'is_active']),
-            models.Index(fields=['session_key']),
-        ]
-
-class VisitorProfile(models.Model):
-    visitor_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    user = models.OneToOneField(User, null=True, blank=True, on_delete=models.CASCADE)
-    first_seen = models.DateTimeField(default=timezone.now)
-    last_seen = models.DateTimeField(default=timezone.now)
-    total_visits = models.PositiveIntegerField(default=0)
+class BibleVerse(models.Model):
+    reference = models.CharField(max_length=100, unique=True)
+    text = models.TextField()
+    date = models.DateField(default=timezone.now)
+    like_count = models.PositiveIntegerField(default=0)
+    share_count = models.PositiveIntegerField(default=0)
     
     def __str__(self):
-        return f"Visitor {self.visitor_id}"        
+        return self.reference
+
+class VerseInteraction(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    verse = models.ForeignKey(BibleVerse, on_delete=models.CASCADE, related_name='interactions')
+    session_key = models.CharField(max_length=40, db_index=True)
+    liked = models.BooleanField(default=False)
+    shared = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        # Use indexes instead of unique_together to avoid the constraint error
+        indexes = [
+            models.Index(fields=['verse', 'session_key']),
+        ]
+    
+    def __str__(self):
+        return f"{self.verse.reference} - {self.session_key}"
