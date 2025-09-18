@@ -222,7 +222,7 @@ import uuid
 
 class BibleVerse(models.Model):
     reference = models.CharField(max_length=100, unique=True)
-    verse_text = models.TextField()
+    text = models.TextField()
     date = models.DateField(default=timezone.now)
     like_count = models.PositiveIntegerField(default=0)
     share_count = models.PositiveIntegerField(default=0)
