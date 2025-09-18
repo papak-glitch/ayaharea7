@@ -33,6 +33,7 @@ urlpatterns = [
     path('like-verse/', views.like_verse, name='like_verse'),
     path('share-verse/', views.share_verse, name='share_verse'),
     path('verse-counts/<str:reference>/', views.get_verse_counts, name='verse_counts'),
+    path('api/online-count/', views.get_online_count, name='online_count'),
     
 
 ]

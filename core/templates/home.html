@@ -953,7 +953,7 @@
                     </div>
                     <div class="col-md-3 col-6 mb-3">
                         <div class="stat-item">
-                            <div class="stat-number" id="onlineCount">0</div>
+                            <div class="stat-number" id="onlineCount">{{ online_count }}</div>
                             <div class="stat-label">Online Now</div>
                         </div>
                     </div>
@@ -1659,6 +1659,177 @@
     });
 
     console.log('Verse of the day loaded:', currentVerse);
+
+    // Online counter with optimizations
+    (function () {
+        let lastUpdateTime = 0;
+        let isTabActive = true;
+        let updateTimer = null;
+        let heartbeatTimer = null;
+
+        // Function to update online count
+        function updateOnlineCount() {
+            // Prevent too frequent updates (max once every 5 seconds)
+            const now = Date.now();
+            if (now - lastUpdateTime < 5000) {
+                return;
+            }
+            lastUpdateTime = now;
+
+            fetch('/api/online-count/')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const onlineCountElement = document.getElementById('onlineCount');
+                    if (onlineCountElement && data.online_count) {
+                        // Smooth transition for count changes
+                        const currentCount = parseInt(onlineCountElement.textContent) || 1;
+                        const newCount = parseInt(data.online_count) || 1;
+
+                        if (currentCount !== newCount) {
+                            animateCountChange(onlineCountElement, currentCount, newCount);
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.log('Online count update failed:', error.message);
+                    // Fallback: keep showing current count or show 1
+                    const onlineCountElement = document.getElementById('onlineCount');
+                    if (onlineCountElement && !onlineCountElement.textContent) {
+                        onlineCountElement.textContent = '1';
+                    }
+                });
+        }
+
+        // Smooth animation for count changes
+        function animateCountChange(element, from, to) {
+            if (Math.abs(to - from) > 10) {
+                // Large changes happen instantly
+                element.textContent = to;
+                return;
+            }
+
+            const steps = Math.abs(to - from);
+            const increment = to > from ? 1 : -1;
+            let current = from;
+            let step = 0;
+
+            const animate = () => {
+                if (step < steps) {
+                    current += increment;
+                    element.textContent = current;
+                    step++;
+                    setTimeout(animate, 100); // 100ms between steps
+                }
+            };
+            animate();
+        }
+
+        // Send heartbeat to maintain online status
+        function sendHeartbeat() {
+            if (!isTabActive) return; // Don't send heartbeat when tab is inactive
+
+            fetch('/api/online-count/', {
+                method: 'HEAD',
+                cache: 'no-cache'
+            }).catch(error => {
+                console.log('Heartbeat failed:', error.message);
+            });
+        }
+
+        // Track if tab is active/visible
+        function handleVisibilityChange() {
+            isTabActive = !document.hidden;
+
+            if (isTabActive) {
+                // Tab became active - update count and resume timers
+                updateOnlineCount();
+                startTimers();
+            } else {
+                // Tab became inactive - pause timers to save resources
+                stopTimers();
+            }
+        }
+
+        // Start all timers
+        function startTimers() {
+            stopTimers(); // Clear existing timers first
+
+            // Update every 30 seconds (only when tab is active)
+            updateTimer = setInterval(() => {
+                if (isTabActive) updateOnlineCount();
+            }, 30000);
+
+            // Heartbeat every 2 minutes (only when tab is active)
+            heartbeatTimer = setInterval(() => {
+                if (isTabActive) sendHeartbeat();
+            }, 120000);
+        }
+
+        // Stop all timers
+        function stopTimers() {
+            if (updateTimer) {
+                clearInterval(updateTimer);
+                updateTimer = null;
+            }
+            if (heartbeatTimer) {
+                clearInterval(heartbeatTimer);
+                heartbeatTimer = null;
+            }
+        }
+
+        // Throttled activity handler
+        let activityTimeout = null;
+        function handleActivity() {
+            if (activityTimeout) return; // Already scheduled
+
+            activityTimeout = setTimeout(() => {
+                if (isTabActive) updateOnlineCount();
+                activityTimeout = null;
+            }, 10000); // Max once every 10 seconds from activity
+        }
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', function () {
+            // Set initial count
+            const onlineCountElement = document.getElementById('onlineCount');
+            if (onlineCountElement && !onlineCountElement.textContent) {
+                onlineCountElement.textContent = '1';
+            }
+
+            // Update immediately
+            updateOnlineCount();
+
+            // Start timers
+            startTimers();
+
+            // Listen for visibility changes
+            document.addEventListener('visibilitychange', handleVisibilityChange);
+
+            // Activity listeners (throttled)
+            ['mousemove', 'keypress', 'click', 'scroll', 'touchstart'].forEach(event => {
+                document.addEventListener(event, handleActivity, { passive: true });
+            });
+
+            // Clean up when page unloads
+            window.addEventListener('beforeunload', function () {
+                stopTimers();
+            });
+        });
+
+        // Expose functions globally for debugging
+        window.onlineCounter = {
+            update: updateOnlineCount,
+            sendHeartbeat: sendHeartbeat,
+            getStatus: () => ({ isTabActive, lastUpdateTime })
+        };
+    })();
+
+
 </script>
 {% endblock %}up"></i>
 <span class="like-count" id="like-count-{{ event.pk }}">0</span>
