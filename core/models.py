@@ -246,3 +246,26 @@ class VerseInteraction(models.Model):
     
     def __str__(self):
         return f"{self.verse.reference} - {self.session_key}"
+    
+from django.contrib.sessions.models import Session
+from django.contrib.auth.models import User
+
+class UserSessionManager(models.Manager):
+    def get_online_count(self):
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        five_minutes_ago = timezone.now() - timedelta(minutes=5)
+        return self.filter(last_activity__gte=five_minutes_ago).count()
+
+class UserSession(models.Model):
+    session_key = models.CharField(max_length=40, unique=True)
+    last_activity = models.DateTimeField(default=timezone.now)
+    user = models.ForeignKey('auth.User', null=True, blank=True, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    objects = UserSessionManager()
+    
+    class Meta:
+        db_table = 'core_usersession'  # Use the existing table name
+        managed = False  # Don't let Django manage the table
