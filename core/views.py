@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import CreateView
-from .models import AnonymousVerseInteraction, Event, GalleryImage, BibleVerse, VerseLike, VerseShare
+from .models import  Event, GalleryImage
 from .forms import EventForm
 from django.contrib import messages
 from django.urls import reverse
@@ -23,7 +23,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.db import transaction
 
 def get_client_ip(request):
-    """Utility to get client IP address from request."""
+    """Get the client IP address from the request."""
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
     if x_forwarded_for:
         ip = x_forwarded_for.split(',')[0]
@@ -31,220 +31,64 @@ def get_client_ip(request):
         ip = request.META.get('REMOTE_ADDR')
     return ip
 
-def get_user_agent(request):
-    """Utility to get user agent string from request."""
-    return request.META.get('HTTP_USER_AGENT', '')
-
-
-
-# Create your views here
-from .models import Event, Notification
-
-def home(request):
-    today = timezone.now().date()
+def home(request):  # Renamed from verse_of_the_day to match your URL pattern
+    """Main home view that displays everything"""
+    print("DEBUG: Home view called")
     
-    # Event queries
-    upcoming_events = Event.objects.filter(date__gte=today).order_by('date', 'time')
-    recent_events = Event.objects.filter(date__lt=today).order_by('-date', '-time')
-    gallery_images = GalleryImage.objects.all()[:10]
+    # Get the most recent verse
+    verse = BibleVerse.objects.order_by('-date').first()
     
-    # Notification queries (only for authenticated users)
-    if request.user.is_authenticated:
-        notifications = Notification.objects.filter(user=request.user).order_by('-created_at')[:10]
-        unread_count = Notification.objects.filter(user=request.user, is_read=False).count()
-    else:
-        notifications = []
-        unread_count = 0
+    print(f"DEBUG: Found verse: {verse}")
     
-    context = {
-        'upcoming_events': upcoming_events,
-        'recent_events': recent_events,
-        'gallery_images': gallery_images,
-        'notifications': notifications,
-        'unread_count': unread_count,
-        'today': today  # Optional: pass today's date to template
-    }
+    if not verse:
+        # Create a default verse if none exists
+        print("DEBUG: No verse found, creating default")
+        verse = BibleVerse.objects.create(
+            reference="John 3:16",
+            text="For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life.",
+            like_count=0,
+            share_count=0
+        )
     
-    return render(request, 'home.html', context=context)
-
-@require_POST
-def like_verse(request, verse_id):
-    """Handle verse like/unlike functionality for ALL users"""
-    verse = get_object_or_404(BibleVerse, id=verse_id)
-    
-    try:
-        with transaction.atomic():
-            ip_address = get_client_ip(request)
-            user_agent = get_user_agent(request)
-            
-            # Ensure session exists
-            if not request.session.session_key:
-                request.session.create()
-            session_key = request.session.session_key
-            
-            user_has_liked = False
-            
-            if request.user.is_authenticated:
-                # For authenticated users
-                like, created = VerseLike.objects.get_or_create(
-                    user=request.user,
-                    verse=verse,
-                    defaults={'ip_address': ip_address}
-                )
-                
-                if not created:
-                    # Unlike - delete the like
-                    like.delete()
-                    user_has_liked = False
-                else:
-                    # New like - also remove any anonymous like from same session
-                    AnonymousVerseInteraction.objects.filter(
-                        verse=verse,
-                        ip_address=ip_address,
-                        session_key=session_key,
-                        interaction_type='like'
-                    ).delete()
-                    user_has_liked = True
-                    
-            else:
-                # For anonymous users
-                existing_like = AnonymousVerseInteraction.objects.filter(
-                    verse=verse,
-                    ip_address=ip_address,
-                    session_key=session_key,
-                    interaction_type='like'
-                ).first()
-                
-                if existing_like:
-                    # Unlike - delete the interaction
-                    existing_like.delete()
-                    user_has_liked = False
-                else:
-                    # New like
-                    AnonymousVerseInteraction.objects.create(
-                        verse=verse,
-                        ip_address=ip_address,
-                        session_key=session_key,
-                        interaction_type='like',
-                        user_agent=user_agent
-                    )
-                    user_has_liked = True
-        
-        # Calculate total likes
-        total_likes = verse.total_likes
-        
-        return JsonResponse({
-            'success': True,
-            'user_has_liked': user_has_liked,
-            'total_likes': total_likes,
-        })
-        
-    except Exception as e:
-        return JsonResponse({
-            'success': False,
-            'error': str(e)
-        }, status=500)
-
-@require_POST 
-def share_verse(request, verse_id):
-    """Handle verse sharing for ALL users"""
-    verse = get_object_or_404(BibleVerse, id=verse_id)
-    
-    try:
-        data = json.loads(request.body) if request.body else {}
-        share_method = data.get('method', 'clipboard')
-        ip_address = get_client_ip(request)
-        user_agent = get_user_agent(request)
-        
-        # Ensure session exists
-        if not request.session.session_key:
-            request.session.create()
-        session_key = request.session.session_key
-        
-        with transaction.atomic():
-            if request.user.is_authenticated:
-                # For authenticated users
-                VerseShare.objects.create(
-                    user=request.user,
-                    verse=verse,
-                    ip_address=ip_address,
-                    share_method=share_method
-                )
-            else:
-                # For anonymous users - allow multiple shares
-                AnonymousVerseInteraction.objects.create(
-                    verse=verse,
-                    ip_address=ip_address,
-                    session_key=session_key,
-                    interaction_type='share',
-                    user_agent=user_agent
-                )
-        
-        # Calculate total shares
-        total_shares = verse.total_shares
-        
-        return JsonResponse({
-            'success': True,
-            'total_shares': total_shares,
-            'message': 'Verse shared successfully!'
-        })
-        
-    except Exception as e:
-        return JsonResponse({
-            'success': False,
-            'error': str(e)
-        }, status=500)
-
-def get_verse_stats(request, verse_id):
-    """Get current stats for a verse - available to ALL users"""
-    verse = get_object_or_404(BibleVerse, id=verse_id)
-    
-    # Get totals
-    total_likes = verse.total_likes
-    total_shares = verse.total_shares
-    
-    # Check if current user has liked
-    user_has_liked = False
-    ip_address = get_client_ip(request)
+    # Get counts for the current user
+    user_liked = False
+    user_shared = False
     
     # Ensure session exists
     if not request.session.session_key:
         request.session.create()
-    session_key = request.session.session_key
+        request.session.save()
     
-    if request.user.is_authenticated:
-        # Check authenticated user likes first
-        user_has_liked = verse.likes.filter(user=request.user).exists()
-        
-        # If not liked as authenticated user, check if they liked as anonymous
-        if not user_has_liked:
-            user_has_liked = AnonymousVerseInteraction.objects.filter(
-                verse=verse,
-                ip_address=ip_address,
-                session_key=session_key,
-                interaction_type='like'
-            ).exists()
-    else:
-        # Check anonymous interaction
-        user_has_liked = AnonymousVerseInteraction.objects.filter(
-            verse=verse,
-            ip_address=ip_address,
-            session_key=session_key,
-            interaction_type='like'
-        ).exists()
+    interaction = VerseInteraction.objects.filter(
+        verse=verse,
+        session_key=request.session.session_key
+    ).first()
     
-    return JsonResponse({
-        'total_likes': total_likes,
-        'total_shares': total_shares,
-        'user_has_liked': user_has_liked,
-    })
+    if interaction:
+        user_liked = interaction.liked
+        user_shared = interaction.shared
+    
+    # Get other data your template needs
+    upcoming_events = Event.objects.filter(date__gte=timezone.now().date()).order_by('date')[:4]
+    recent_events = Event.objects.filter(date__lt=timezone.now().date()).order_by('-date')[:4]
+    
+    context = {
+        'verse': verse,
+        'user_liked': user_liked,
+        'user_shared': user_shared,
+        'upcoming_events': upcoming_events,
+        'recent_events': recent_events,
+        # Add other context variables your template needs
+    }
+    
+    return render(request, 'home.html', context)  # Make sure this matches your template name
 
 
-def mark_as_read(request, notification_id):
-    notification = Notification.objects.get(id=notification_id, user=request.user)
-    notification.is_read = True
-    notification.save()
-    return JsonResponse({'status': 'success'})
+
+
+
+
+
 
 def about(request):
     template_name = 'about.html'
@@ -610,92 +454,238 @@ def event_likes_count(request, event_id):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
     
-from django.http import JsonResponse
-from django.views.decorators.http import require_POST
-from django.contrib.auth.decorators import login_required
 
-@require_POST
-def like_verse(request, verse_id):
-    verse = BibleVerse.objects.get(id=verse_id)
-    
-    # Track either by user or IP
-    if request.user.is_authenticated:
-        like, created = VerseLike.objects.get_or_create(user=request.user, verse=verse)
-    else:
-        ip = request.META.get('REMOTE_ADDR', '')
-        like, created = VerseLike.objects.get_or_create(ip_address=ip, verse=verse, defaults={'user': None})
-    
-    if not created:
-        like.delete()  # Toggle like
-    
-    return JsonResponse({
-        'total_likes': verse.verselike_set.count(),
-        'user_has_liked': created
-    }) 
-    
+
+from django.shortcuts import render, HttpResponse
 from django.http import JsonResponse
-from django.utils import timezone
-from datetime import timedelta
-from django.views.decorators.http import require_GET, require_POST
 from django.views.decorators.csrf import csrf_exempt
-from django.db import transaction
-from .models import ActiveConnection
+from django.views.decorators.http import require_POST
+from django.conf import settings
+from .models import BibleVerse, VerseInteraction
 import json
+import os
 
-@require_GET
-def exact_online_users(request):
-    """Get exact count of currently online users"""
-    five_minutes_ago = timezone.now() - timedelta(minutes=5)
+def verse_of_the_day(request):
+    """Main view that displays the verse of the day"""
+    print("DEBUG: verse_of_the_day view called")
     
-    try:
-        # Count active connections from last 5 minutes
-        online_count = ActiveConnection.objects.filter(
-            last_heartbeat__gte=five_minutes_ago,
-            is_active=True
-        ).count()
-        
-        return JsonResponse({
-            'online_count': online_count,
-            'timestamp': timezone.now().isoformat(),
-            'status': 'success'
-        })
-        
-    except Exception as e:
-        return JsonResponse({
-            'online_count': 0,
-            'status': 'error',
-            'message': str(e)
-        })
+    # Get the most recent verse
+    verse = BibleVerse.objects.order_by('-date').first()
+    
+    print(f"DEBUG: Found verse: {verse}")
+    
+    if not verse:
+        # Create a default verse if none exists
+        print("DEBUG: No verse found, creating default")
+        verse = BibleVerse.objects.create(
+            reference="John 3:16",
+            text="For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life.",
+            like_count=0,
+            share_count=0
+        )
+    
+    # Get counts for the current user
+    user_liked = False
+    user_shared = False
+    
+    # Ensure session exists
+    if not request.session.session_key:
+        request.session.create()
+        request.session.save()
+    
+    interaction = VerseInteraction.objects.filter(
+        verse=verse,
+        session_key=request.session.session_key
+    ).first()
+    
+    if interaction:
+        user_liked = interaction.liked
+        user_shared = interaction.shared
+    
+    # Debug: Check template existence
+    template_path = os.path.join(settings.BASE_DIR, 'templates', 'verse_display.html')
+    print(f"DEBUG: Looking for template at: {template_path}")
+    print(f"DEBUG: Template exists: {os.path.exists(template_path)}")
+    
+    context = {
+        'verse': verse,
+        'user_liked': user_liked,
+        'user_shared': user_shared,
+    }
+    
+    return render(request, 'verse_display.html', context)
 
 @csrf_exempt
 @require_POST
-def connection_heartbeat(request):
-    """Update connection heartbeat"""
+def like_verse(request):
     try:
+        # Ensure session exists
+        if not request.session.session_key:
+            request.session.create()
+            request.session.save()
+        
         data = json.loads(request.body)
-        session_key = request.session.session_key
+        reference = data.get('reference', '')
+        text = data.get('text', '')
         
-        if not session_key:
-            return JsonResponse({'status': 'error', 'message': 'No session'})
+        if not reference:
+            return JsonResponse({'success': False, 'error': 'No reference provided'})
         
-        with transaction.atomic():
-            # Update heartbeat timestamp
-            updated = ActiveConnection.objects.filter(
-                session_key=session_key,
-                is_active=True
-            ).update(last_heartbeat=timezone.now())
-            
-            if updated == 0:
-                # Create new connection if not exists
-                ActiveConnection.objects.create(
-                    session_key=session_key,
-                    user=request.user if request.user.is_authenticated else None,
-                    ip_address=request.META.get('REMOTE_ADDR'),
-                    user_agent=request.META.get('HTTP_USER_AGENT', '')[:500],
-                    last_heartbeat=timezone.now()
-                )
+        # Get or create verse
+        verse, created = BibleVerse.objects.get_or_create(
+            reference=reference,
+            defaults={'text': text}
+        )
         
-        return JsonResponse({'status': 'success'})
+        # If verse exists but text is empty, update it
+        if not created and not verse.text and text:
+            verse.text = text
+            verse.save()
+        
+        # Check if interaction already exists
+        interaction = VerseInteraction.objects.filter(
+            verse=verse,
+            session_key=request.session.session_key
+        ).first()
+        
+        if interaction:
+            # Toggle like status
+            interaction.liked = not interaction.liked
+            interaction.save()
+        else:
+            # Create new interaction
+            interaction = VerseInteraction.objects.create(
+                verse=verse,
+                session_key=request.session.session_key,
+                liked=True
+            )
+        
+        # Update counts
+        verse.like_count = VerseInteraction.objects.filter(verse=verse, liked=True).count()
+        verse.share_count = VerseInteraction.objects.filter(verse=verse, shared=True).count()
+        verse.save()
+        
+        return JsonResponse({
+            'success': True,
+            'liked': interaction.liked,
+            'like_count': verse.like_count,
+            'share_count': verse.share_count
+        })
         
     except Exception as e:
-        return JsonResponse({'status': 'error', 'message': str(e)})
+        return JsonResponse({'success': False, 'error': str(e)})
+
+@csrf_exempt
+@require_POST
+def share_verse(request):
+    try:
+        # Ensure session exists
+        if not request.session.session_key:
+            request.session.create()
+            request.session.save()
+        
+        data = json.loads(request.body)
+        reference = data.get('reference', '')
+        text = data.get('text', '')
+        
+        if not reference:
+            return JsonResponse({'success': False, 'error': 'No reference provided'})
+        
+        # Get or create verse
+        verse, created = BibleVerse.objects.get_or_create(
+            reference=reference,
+            defaults={'text': text}
+        )
+        
+        # If verse exists but text is empty, update it
+        if not created and not verse.text and text:
+            verse.text = text
+            verse.save()
+        
+        # Check if interaction already exists
+        interaction = VerseInteraction.objects.filter(
+            verse=verse,
+            session_key=request.session.session_key
+        ).first()
+        
+        if interaction:
+            # Update existing interaction
+            interaction.shared = True
+            interaction.save()
+        else:
+            # Create new interaction
+            interaction = VerseInteraction.objects.create(
+                verse=verse,
+                session_key=request.session.session_key,
+                shared=True
+            )
+        
+        # Update counts
+        verse.share_count = VerseInteraction.objects.filter(verse=verse, shared=True).count()
+        verse.like_count = VerseInteraction.objects.filter(verse=verse, liked=True).count()
+        verse.save()
+        
+        return JsonResponse({
+            'success': True,
+            'shared': True,
+            'share_count': verse.share_count,
+            'like_count': verse.like_count
+        })
+        
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+def get_verse_counts(request, reference):
+    """Get like and share counts for a verse"""
+    try:
+        verse = BibleVerse.objects.get(reference=reference)
+        user_liked = False
+        user_shared = False
+        
+        if request.session.session_key:
+            interaction = VerseInteraction.objects.filter(
+                verse=verse,
+                session_key=request.session.session_key
+            ).first()
+            
+            if interaction:
+                user_liked = interaction.liked
+                user_shared = interaction.shared
+        
+        return JsonResponse({
+            'success': True,
+            'like_count': verse.like_count,
+            'share_count': verse.share_count,
+            'user_liked': user_liked,
+            'user_shared': user_shared
+        })
+        
+    except BibleVerse.DoesNotExist:
+        return JsonResponse({
+            'success': True,
+            'like_count': 0,
+            'share_count': 0,
+            'user_liked': False,
+            'user_shared': False
+        })
+    
+# views.py - add this function
+import random
+
+def get_random_verse(request):
+    """Get a random verse from the database"""
+    verses = BibleVerse.objects.all()
+    if verses.exists():
+        random_verse = random.choice(verses)
+        return JsonResponse({
+            'success': True,
+            'reference': random_verse.reference,
+            'text': random_verse.text,
+            'like_count': random_verse.like_count,
+            'share_count': random_verse.share_count
+        })
+    else:
+        return JsonResponse({
+            'success': False,
+            'error': 'No verses available'
+        })    
