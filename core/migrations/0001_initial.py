@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('reference', models.CharField(max_length=100, unique=True)),
-                ('text', models.TextField()),
+                ('verse_text', models.TextField()),
                 ('date', models.DateField(default=django.utils.timezone.now)),
                 ('like_count', models.PositiveIntegerField(default=0)),
                 ('share_count', models.PositiveIntegerField(default=0)),
